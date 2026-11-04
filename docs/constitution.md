@@ -1,0 +1,17 @@
+# Constitución — Kanban 
+
+Principios innegociables. Toda spec, plan y tarea debe cumplirlos sin excepción[cite: 3].
+
+1. **Arquitectura modular por dominios**: Toda la lógica de negocio, manipulación de columnas y tareas vive estrictamente en `src/kanban/` (`core`, `components`, `store`, `hooks`, `layouts`, `pages`)[cite: 3]. Los componentes base reutilizables residen en `src/components/ui/` o `src/components/custom/`[cite: 3]. Prohibido crear archivos o utilidades dispersos en la raíz de `src/`[cite: 3].
+2. **La spec manda**: Nada se implementa si no está recogido y aprobado en la spec activa (`specs/NNN-*/`)[cite: 3]. Si falta un requisito, un caso de borde (columnas vacías, soltado fuera de zona válida, colisiones de IDs) o una decisión de diseño, el agente se detiene y pregunta antes de asumir[cite: 3].
+3. **Tipado estricto innegociable**: Cero `any` y cero tipos implícitos[cite: 3]. Todas las entidades (columnas, tarjetas, filtros, eventos de arrastre) derivan de contratos explícitos en `src/interfaces/*.interface.ts`, y todo componente tipa sus propiedades mediante `interface Props`[cite: 3].
+4. **Pureza matemática en el core**: Las funciones ubicadas en `src/kanban/core/` (reordenación intra-columna con `arrayMove`, transferencia inter-columna, ordenación por peso/posición y filtrado determinista) son estrictamente puras[cite: 3]. No dependen de hooks de React, variables globales, elementos del DOM ni del store de Zustand, garantizando tests unitarios deterministas[cite: 3].
+5. **Estado predecible e inmutable**: Las mutaciones del store de Zustand (`src/kanban/store/kanban.store.ts`) deben ser puras, atómicas e inmutables[cite: 3]. Las colecciones de tareas y columnas se actualizan generando nuevas estructuras clonadas (`...state`), previniendo mutaciones directas y renders fantasmas[cite: 3].
+6. **Integridad de datos y persistencia**: Persistencia defensiva en `localStorage` bajo la clave `kanban-storage` para columnas y tarjetas activas[cite: 3]. Cualquier cambio en las interfaces del estado debe incorporar valores por defecto para evitar roturas o pérdidas de datos tras recargar la página[cite: 3].
+7. **Rendimiento en Drag & Drop y accesibilidad**:
+   - Desacoplamiento visual estricto: el elemento en arrastre se renderiza exclusivamente a través de un `<DragOverlay>` para garantizar 60 FPS estables sin alterar el layout en la lista de origen.
+   - Identificadores de sensores únicos y tipados (prohibido usar índices numéricos de array como identificadores de `@dnd-kit`).
+   - Accesibilidad mediante sensores de puntero y teclado (`KeyboardSensor`) configurados según las pautas de `@dnd-kit`.
+   - Estilos visuales construidos exclusivamente con utilidades de Tailwind CSS combinadas mediante el helper `cn()` de `@/lib/utils`[cite: 3].
+8. **Compilación y verificación como puerta de paso**: Prohibido dar por cerrada una tarea o avanzar con errores en `npx tsc --noEmit`, avisos de `npm run lint` o fallos en el empaquetado de producción (`npm run build`)[cite: 3].
+9. **Convención lingüística**: Código, variables, contratos de TypeScript, nombres de carpetas y commits en inglés; documentación de gobernanza (`docs/`), especificaciones (`specs/`), memoria (`MEMORY.md`) y textos de interfaz en español[cite: 3].

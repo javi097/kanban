@@ -59,7 +59,7 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
   - Props: `interface Props { task: Task }`.
   - Hecho cuando: el componente compila, no tiene estado propio ni efectos secundarios, y `npx tsc --noEmit` pasa limpio.
 
-- [ ] **T7. Modificar `src/kanban/components/Card/KanbanCard.tsx`: integrar `useSortable`.** RF-1.3, RF-1.4, RNF-3
+- [x] **T7. Modificar `src/kanban/components/Card/KanbanCard.tsx`: integrar `useSortable`.** RF-1.3, RF-1.4, RNF-3
   - Llamar a `useSortable({ id: 'task-' + task.id })` y conectar `setNodeRef`, `style` (con `CSS.Transform.toString`), `attributes` y `listeners` al `<article>`.
   - Aplicar `opacity-40` al `<article>` cuando `isDragging === true`.
   - Hecho cuando: `npx tsc --noEmit` pasa limpio y la tarjeta se muestra semitransparente en su posición original durante el arrastre (verificación visual en el navegador).

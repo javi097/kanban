@@ -1,3 +1,6 @@
+import type { CSSProperties } from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { CalendarDays, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Task, Priority } from '@/interfaces/kanban.interface';
@@ -13,13 +16,31 @@ interface Props {
 }
 
 export function KanbanCard({ task }: Props) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: `task-${task.id}` });
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   return (
-    <article className="group rounded-lg border border-[#e5e5e1] bg-white p-4 shadow-[0_1px_2px_rgba(20,20,20,0.03)] transition-shadow hover:shadow-md">
+    <article
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={cn(
+        'group cursor-grab rounded-lg border border-[#e5e5e1] bg-white p-4 shadow-[0_1px_2px_rgba(20,20,20,0.03)] transition-shadow hover:shadow-md',
+        isDragging && 'opacity-40',
+      )}
+    >
       <div className="mb-3 flex items-start justify-between gap-2">
         <h3 className="text-[14px] font-semibold leading-5 text-[#292a2f]">
           {task.title}
         </h3>
         <button
+          type="button"
           aria-label={`More options for ${task.title}`}
           className="text-[#b1b2b3] opacity-0 transition-opacity group-hover:opacity-100"
         >

@@ -14,7 +14,7 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
   - Editar `src/interfaces/kanban.interface.ts`: exportar `export type UniqueId = string;`.
   - Hecho cuando: `npx tsc --noEmit` pasa limpio y el tipo es importable desde cualquier módulo con `@/interfaces/kanban.interface`.
 
-- [ ] **T2. Crear `src/kanban/core/reorder.ts` con las funciones puras.** RF-2.2, RF-2.3, RF-3.3, RNF-2, RNF-3
+- [x] **T2. Crear `src/kanban/core/reorder.ts` con las funciones puras.** RF-2.2, RF-2.3, RF-3.3, RNF-2, RNF-3
   - Implementar y exportar `reorderInColumn(tasks, status, activeId, overId): Task[]`.
   - Implementar y exportar `transferTask(tasks, activeId, newStatus, overId): Task[]`.
   - Implementar y exportar el helper `getColumnTasks(tasks, status): Task[]`.

@@ -1,7 +1,10 @@
+import { DndContext, DragOverlay, closestCorners } from '@dnd-kit/core';
 import { CalendarDays, Circle, Clock3, CheckCircle2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { BoardHeader } from '@/kanban/components/Board/BoardHeader';
 import { KanbanColumn } from '@/kanban/components/Column/KanbanColumn';
+import { DragOverlayCard } from '@/kanban/components/Board/DragOverlayCard';
+import { useKanbanDnd } from '@/kanban/hooks/useKanbanDnd';
 import { useKanbanStore } from '@/kanban/store/kanban.store';
 import type { Status } from '@/interfaces/kanban.interface';
 
@@ -19,6 +22,8 @@ const COLUMNS: ColumnDef[] = [
 
 export function BoardPage() {
   const tasks = useKanbanStore((s) => s.tasks);
+  const { sensors, activeTask, handleDragStart, handleDragOver, handleDragEnd } =
+    useKanbanDnd();
 
   return (
     <main className="min-h-screen bg-[#f8f8f6] text-[#202124]">
@@ -41,12 +46,24 @@ export function BoardPage() {
           </div>
         </div>
 
-        {/* Columns grid */}
-        <section className="grid gap-5 lg:grid-cols-3">
-          {COLUMNS.map(({ name, icon, color }) => (
-            <KanbanColumn key={name} name={name} icon={icon} color={color} />
-          ))}
-        </section>
+        {/* DndContext & Columns grid */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
+          <section className="grid gap-5 lg:grid-cols-3">
+            {COLUMNS.map(({ name, icon, color }) => (
+              <KanbanColumn key={name} name={name} icon={icon} color={color} />
+            ))}
+          </section>
+
+          <DragOverlay>
+            {activeTask ? <DragOverlayCard task={activeTask} /> : null}
+          </DragOverlay>
+        </DndContext>
 
         <footer className="flex items-center justify-between pt-7 text-[11px] text-[#aaa9a5]">
           <span>Last updated just now</span>

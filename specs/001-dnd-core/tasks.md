@@ -69,7 +69,7 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
   - Envolver la lista de tarjetas con `<SortableContext items={columnTasks.map(t => 'task-' + t.id)} strategy={verticalListSortingStrategy}>`.
   - Hecho cuando: `npx tsc --noEmit` pasa limpio y una columna vacía acepta tarjetas soltadas en ella (verificación visual).
 
-- [ ] **T9. Modificar `src/kanban/pages/BoardPage.tsx`: montar `DndContext` y `DragOverlay`.** RF-1.3, RF-2.1, RF-3.1, RF-4.1, RF-4.2
+- [x] **T9. Modificar `src/kanban/pages/BoardPage.tsx`: montar `DndContext` y `DragOverlay`.** RF-1.3, RF-2.1, RF-3.1, RF-4.1, RF-4.2
   - Llamar a `useKanbanDnd()` y conectar sus handlers y sensores a `<DndContext collisionDetection={closestCorners} ...>`.
   - Envolver la sección de columnas con ese `DndContext`.
   - Renderizar `<DragOverlay>{activeTask ? <DragOverlayCard task={activeTask} /> : null}</DragOverlay>` dentro del `DndContext`.

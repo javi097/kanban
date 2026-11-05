@@ -21,7 +21,7 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
   - Cero importaciones de React, Zustand o @dnd-kit en este archivo.
   - Hecho cuando: el archivo compila sin errores y todas las funciones están exportadas con sus firmas tipadas.
 
-- [ ] **T3. Crear la suite de tests unitarios en `src/kanban/core/__tests__/reorder.test.ts`.** RF-2.2, RF-2.3, RF-3.3, RNF-2, CL-1
+- [x] **T3. Crear la suite de tests unitarios en `src/kanban/core/__tests__/reorder.test.ts`.** RF-2.2, RF-2.3, RF-3.3, RNF-2, CL-1
   - Definir un fixture de 7 tareas hardcodeado (IDs como `'task-1'`…`'task-7'`), sin imports de store ni React.
   - Implementar los 12 casos TC-1 a TC-12 descritos en `plan.md §7`.
   - Hecho cuando: `npm test` ejecuta los 12 casos y todos pasan en verde con 0 fallos.

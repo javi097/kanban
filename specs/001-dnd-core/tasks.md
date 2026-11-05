@@ -39,7 +39,7 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
 
 ## Bloque C — Hook de orquestación
 
-- [ ] **T5. Crear `src/kanban/hooks/useKanbanDnd.ts`.** RF-1.1, RF-1.2, RF-1.3, RF-2.1, RF-3.1, RF-4.1, RF-4.2
+- [x] **T5. Crear `src/kanban/hooks/useKanbanDnd.ts`.** RF-1.1, RF-1.2, RF-1.3, RF-2.1, RF-3.1, RF-4.1, RF-4.2
   - Configurar `PointerSensor` con `activationConstraint: { distance: 5 }`.
   - Configurar `KeyboardSensor` con `sortableKeyboardCoordinates`.
   - Implementar `handleDragStart`: captura `activeTask` por `active.id`.

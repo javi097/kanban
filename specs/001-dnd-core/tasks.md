@@ -79,14 +79,14 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
 
 ## Bloque E — Validación final
 
-- [ ] **T10. Validación end-to-end y criterios de finalización de la spec.** Todos los RF
+- [x] **T10. Validación end-to-end y criterios de finalización de la spec.** Todos los RF
   - Verificar en el navegador (Chrome DevTools MCP) que:
-    - [ ] Una tarjeta muestra clon flotante (`DragOverlayCard`) al arrastrarla.
-    - [ ] Se puede reordenar dentro de la misma columna y el nuevo orden persiste tras `F5`.
-    - [ ] Se puede mover entre columnas y el contador de cada columna se actualiza.
-    - [ ] Soltar fuera del tablero devuelve la tarjeta a su posición original sin corromper el estado.
-    - [ ] Pulsar `Escape` cancela el arrastre sin alterar el estado.
-    - [ ] `localStorage['kanban-storage']` refleja el nuevo orden tras cada movimiento.
+    - [x] Una tarjeta muestra clon flotante (`DragOverlayCard`) al arrastrarla.
+    - [x] Se puede reordenar dentro de la misma columna y el nuevo orden persiste tras `F5`.
+    - [x] Se puede mover entre columnas y el contador de cada columna se actualiza.
+    - [x] Soltar fuera del tablero devuelve la tarjeta a su posición original sin corromper el estado.
+    - [x] Pulsar `Escape` cancela el arrastre sin alterar el estado.
+    - [x] `localStorage['kanban-storage']` refleja el nuevo orden tras cada movimiento.
   - Pasar `npx tsc --noEmit` con 0 errores.
   - Pasar `npm run lint` con 0 warnings ni errores.
   - Hecho cuando: todos los criterios de finalización de `spec.md` están marcados en verde.

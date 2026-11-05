@@ -61,12 +61,12 @@ El tablero Kanban cuenta con una interfaz visual maquetada y un estado básico e
 - Soporte para arrastre táctil multidedo.
 
 ## Criterios de finalización
-- [ ] La tarjeta se toma y muestra una réplica flotante con `DragOverlay`.
-- [ ] Las tarjetas pueden intercambiar su orden dentro de la misma columna.
-- [ ] Las tarjetas pueden moverse de una columna a otra, actualizando su contador de columna.
-- [ ] Al recargar la página (`F5`), las tarjetas conservan sus columnas y posiciones exactas.
-- [ ] Soltar fuera del tablero o pulsar `Escape` no corrompe el orden de la lista.
-- [ ] `npx tsc --noEmit` y `npm run lint` pasan con 0 errores y sin usar `any`.
+- [x] La tarjeta se toma y muestra una réplica flotante con `DragOverlay`.
+- [x] Las tarjetas pueden intercambiar su orden dentro de la misma columna.
+- [x] Las tarjetas pueden moverse de una columna a otra, actualizando su contador de columna.
+- [x] Al recargar la página (`F5`), las tarjetas conservan sus columnas y posiciones exactas.
+- [x] Soltar fuera del tablero o pulsar `Escape` no corrompe el orden de la lista.
+- [x] `npx tsc --noEmit` y `npm run lint` pasan con 0 errores y sin usar `any`.
 
 ## Dudas abiertas
 *(Ninguna. El alcance está completamente acotado al núcleo de arrastre y soltado.)*

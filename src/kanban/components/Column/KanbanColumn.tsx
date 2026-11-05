@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus, MoreHorizontal, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,6 +15,8 @@ interface Props {
 }
 
 export function KanbanColumn({ name, icon: Icon, color }: Props) {
+  const { setNodeRef } = useDroppable({ id: name });
+
   const tasks = useKanbanStore((s) => s.tasks);
   const addingTo = useKanbanStore((s) => s.addingTo);
   const setAddingTo = useKanbanStore((s) => s.setAddingTo);
@@ -35,7 +39,10 @@ export function KanbanColumn({ name, icon: Icon, color }: Props) {
   }
 
   return (
-    <div className="flex min-h-[520px] flex-col rounded-xl border border-[#e8e8e4] bg-[#f1f1ee] p-3.5 sm:p-4">
+    <div
+      ref={setNodeRef}
+      className="flex min-h-[520px] flex-col rounded-xl border border-[#e8e8e4] bg-[#f1f1ee] p-3.5 sm:p-4"
+    >
       {/* Column header */}
       <div className="mb-4 flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
@@ -57,9 +64,14 @@ export function KanbanColumn({ name, icon: Icon, color }: Props) {
 
       {/* Task list */}
       <div className="flex flex-1 flex-col gap-3">
-        {columnTasks.map((task) => (
-          <KanbanCard key={task.id} task={task} />
-        ))}
+        <SortableContext
+          items={columnTasks.map((t) => `task-${t.id}`)}
+          strategy={verticalListSortingStrategy}
+        >
+          {columnTasks.map((task) => (
+            <KanbanCard key={task.id} task={task} />
+          ))}
+        </SortableContext>
 
         {/* Inline add form or add button */}
         {isAdding ? (
@@ -90,6 +102,7 @@ export function KanbanColumn({ name, icon: Icon, color }: Props) {
           </form>
         ) : (
           <button
+            type="button"
             onClick={() => setAddingTo(name)}
             className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-medium text-[#97989c] transition-colors hover:bg-white hover:text-[#55565d]"
           >

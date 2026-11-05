@@ -64,7 +64,7 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
   - Aplicar `opacity-40` al `<article>` cuando `isDragging === true`.
   - Hecho cuando: `npx tsc --noEmit` pasa limpio y la tarjeta se muestra semitransparente en su posición original durante el arrastre (verificación visual en el navegador).
 
-- [ ] **T8. Modificar `src/kanban/components/Column/KanbanColumn.tsx`: añadir `useDroppable` y `SortableContext`.** RF-3.1, RF-3.2, CL-1, CL-3
+- [x] **T8. Modificar `src/kanban/components/Column/KanbanColumn.tsx`: añadir `useDroppable` y `SortableContext`.** RF-3.1, RF-3.2, CL-1, CL-3
   - Llamar a `useDroppable({ id: name })` y conectar `setNodeRef` al contenedor exterior de la columna.
   - Envolver la lista de tarjetas con `<SortableContext items={columnTasks.map(t => 'task-' + t.id)} strategy={verticalListSortingStrategy}>`.
   - Hecho cuando: `npx tsc --noEmit` pasa limpio y una columna vacía acepta tarjetas soltadas en ella (verificación visual).

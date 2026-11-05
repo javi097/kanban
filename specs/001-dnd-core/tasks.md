@@ -30,7 +30,7 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
 
 ## Bloque B — Store Zustand
 
-- [ ] **T4. Actualizar `src/kanban/store/kanban.store.ts`: añadir `reorderTasks` y eliminar `moveTask`.** RF-2.2, RF-3.3, RF-5.1, RNF-2
+- [x] **T4. Actualizar `src/kanban/store/kanban.store.ts`: añadir `reorderTasks` y eliminar `moveTask`.** RF-2.2, RF-3.3, RF-5.1, RNF-2
   - Añadir la acción `reorderTasks: (newTasks: Task[]) => void` que llama a `set({ tasks: newTasks })`.
   - Eliminar la acción `moveTask` (obsoleta con la nueva arquitectura DnD).
   - Hecho cuando: `npx tsc --noEmit` pasa limpio y no existe ninguna referencia a `moveTask` en el codebase (`grep -r moveTask src` devuelve vacío).

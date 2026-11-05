@@ -3,6 +3,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus, MoreHorizontal, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { KanbanCard } from '@/kanban/components/Card/KanbanCard';
 import { useKanbanStore } from '@/kanban/store/kanban.store';
@@ -15,7 +16,7 @@ interface Props {
 }
 
 export function KanbanColumn({ name, icon: Icon, color }: Props) {
-  const { setNodeRef } = useDroppable({ id: name });
+  const { setNodeRef, isOver } = useDroppable({ id: name });
 
   const tasks = useKanbanStore((s) => s.tasks);
   const addingTo = useKanbanStore((s) => s.addingTo);
@@ -24,7 +25,10 @@ export function KanbanColumn({ name, icon: Icon, color }: Props) {
 
   const [newTitle, setNewTitle] = useState('');
 
-  const columnTasks = tasks.filter((task) => task.status === name);
+  const columnTasks = Array.isArray(tasks)
+    ? tasks.filter((task) => Boolean(task && task.status === name && typeof task.id === 'number'))
+    : [];
+
   const isAdding = addingTo === name;
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -41,7 +45,10 @@ export function KanbanColumn({ name, icon: Icon, color }: Props) {
   return (
     <div
       ref={setNodeRef}
-      className="flex min-h-[520px] flex-col rounded-xl border border-[#e8e8e4] bg-[#f1f1ee] p-3.5 sm:p-4"
+      className={cn(
+        'flex min-h-[520px] flex-col rounded-xl border border-[#e8e8e4] bg-[#f1f1ee] p-3.5 sm:p-4 transition-colors',
+        isOver && 'border-blue-400/60 bg-[#ebebe6] ring-2 ring-blue-400/20',
+      )}
     >
       {/* Column header */}
       <div className="mb-4 flex items-center justify-between px-1">
@@ -80,6 +87,8 @@ export function KanbanColumn({ name, icon: Icon, color }: Props) {
             className="rounded-lg border border-[#d9d9d4] bg-white p-3 shadow-sm"
           >
             <input
+              id={`new-task-title-${name}`}
+              name="title"
               autoFocus
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}

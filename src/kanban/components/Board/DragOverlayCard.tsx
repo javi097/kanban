@@ -13,6 +13,10 @@ interface Props {
 }
 
 export function DragOverlayCard({ task }: Props) {
+  if (!task || typeof task.id !== 'number') {
+    return null;
+  }
+
   return (
     <article className="group cursor-grabbing rounded-lg border border-[#e5e5e1] bg-white p-4 shadow-xl opacity-95 rotate-1 scale-[1.02] transition-transform">
       <div className="mb-3 flex items-start justify-between gap-2">

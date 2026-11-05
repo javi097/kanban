@@ -16,13 +16,21 @@ interface Props {
 }
 
 export function KanbanCard({ task }: Props) {
+  const taskId = task?.id ?? 0;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: `task-${task.id}` });
+    useSortable({
+      id: `task-${taskId}`,
+      disabled: !task || typeof task.id !== 'number',
+    });
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  if (!task || typeof task.id !== 'number') {
+    return null;
+  }
 
   return (
     <article

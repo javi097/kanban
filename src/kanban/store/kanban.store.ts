@@ -71,8 +71,6 @@ interface KanbanState {
 
   setAddingTo: (status: Status | null) => void;
   addTask: (title: string, status: Status) => void;
-  /** Reemplaza la lista completa de tareas. Usada por el hook DnD tras
-   *  calcular el nuevo orden con las funciones puras de reorder.ts. */
   reorderTasks: (newTasks: Task[]) => void;
 }
 
@@ -99,8 +97,29 @@ export const useKanbanStore = create<KanbanState>()(
         set((state) => ({ tasks: [...state.tasks, newTask], addingTo: null }));
       },
 
-      reorderTasks: (newTasks) => set({ tasks: newTasks }),
+      reorderTasks: (newTasks) => {
+        if (!Array.isArray(newTasks)) return;
+        const validTasks = newTasks.filter(
+          (t): t is Task => Boolean(t && typeof t.id === 'number' && t.status),
+        );
+        set({ tasks: validTasks });
+      },
     }),
-    { name: 'kanban-storage' },
+    {
+      name: 'kanban-storage',
+      migrate: (persistedState: unknown) => {
+        const state = persistedState as { tasks?: Task[] } | undefined;
+        if (!state || !Array.isArray(state.tasks)) {
+          return { tasks: INITIAL_TASKS, addingTo: null };
+        }
+        const validTasks = state.tasks.filter(
+          (t): t is Task => Boolean(t && typeof t.id === 'number' && t.status),
+        );
+        return {
+          ...state,
+          tasks: validTasks.length > 0 ? validTasks : INITIAL_TASKS,
+        };
+      },
+    },
   ),
 );

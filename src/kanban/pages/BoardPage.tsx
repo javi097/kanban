@@ -1,4 +1,11 @@
-import { DndContext, DragOverlay, closestCorners } from '@dnd-kit/core';
+import {
+  DndContext,
+  DragOverlay,
+  pointerWithin,
+  rectIntersection,
+  closestCorners,
+  type CollisionDetection,
+} from '@dnd-kit/core';
 import { CalendarDays, Circle, Clock3, CheckCircle2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { BoardHeader } from '@/kanban/components/Board/BoardHeader';
@@ -20,10 +27,33 @@ const COLUMNS: ColumnDef[] = [
   { name: 'Done', icon: CheckCircle2, color: 'text-emerald-600' },
 ];
 
+const collisionDetectionStrategy: CollisionDetection = (args) => {
+  // 1. Prioridad alta: puntero directo dentro del contenedor o tarjeta objetivo
+  const pointerCollisions = pointerWithin(args);
+  if (pointerCollisions.length > 0) {
+    return pointerCollisions;
+  }
+
+  // 2. Intersección de rectángulos
+  const rectCollisions = rectIntersection(args);
+  if (rectCollisions.length > 0) {
+    return rectCollisions;
+  }
+
+  // 3. Fallback de esquinas más cercanas (ej. navegación con teclado)
+  return closestCorners(args);
+};
+
 export function BoardPage() {
   const tasks = useKanbanStore((s) => s.tasks);
-  const { sensors, activeTask, handleDragStart, handleDragOver, handleDragEnd } =
-    useKanbanDnd();
+  const {
+    sensors,
+    activeTask,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+    handleDragCancel,
+  } = useKanbanDnd();
 
   return (
     <main className="min-h-screen bg-[#f8f8f6] text-[#202124]">
@@ -49,10 +79,11 @@ export function BoardPage() {
         {/* DndContext & Columns grid */}
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCorners}
+          collisionDetection={collisionDetectionStrategy}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
         >
           <section className="grid gap-5 lg:grid-cols-3">
             {COLUMNS.map(({ name, icon, color }) => (

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { reorderInColumn, transferTask, getColumnTasks } from '@/kanban/core/reorder';
-import type { Task } from '@/interfaces/kanban.interface';
+import type { Task, Status } from '@/interfaces/kanban.interface';
 
 // ---------------------------------------------------------------------------
 // Fixture: 7 tareas distribuidas en 3 columnas (sin imports de store ni React)
@@ -28,14 +28,12 @@ describe('reorderInColumn', () => {
   it('TC-1: mueve una tarjeta hacia abajo dentro de la columna', () => {
     const result = reorderInColumn(tasks(), 'To Do', 'task-1', 'task-3');
     const col = getColumnTasks(result, 'To Do');
-    // 1→2→3 debe quedar 2→3→1
     expect(col.map((t) => t.id)).toEqual([2, 3, 1]);
   });
 
   it('TC-2: mueve una tarjeta hacia arriba dentro de la columna', () => {
     const result = reorderInColumn(tasks(), 'To Do', 'task-3', 'task-1');
     const col = getColumnTasks(result, 'To Do');
-    // 1→2→3 debe quedar 3→1→2
     expect(col.map((t) => t.id)).toEqual([3, 1, 2]);
   });
 
@@ -65,6 +63,23 @@ describe('reorderInColumn', () => {
     expect(inProgress.map((t) => t.id)).toEqual([4, 5]);
     expect(done.map((t) => t.id)).toEqual([6, 7]);
   });
+
+  it('TC-GUARD-1: maneja arrays con valores nulos sin introducir undefined ni romper', () => {
+    const corruptedTasks = [
+      ...tasks(),
+      undefined as unknown as Task,
+      null as unknown as Task,
+    ];
+    const result = reorderInColumn(corruptedTasks, 'To Do', 'task-1', 'task-2');
+    expect(result.every((t) => t !== undefined && t !== null)).toBe(true);
+    expect(result.every((t) => typeof t.id === 'number')).toBe(true);
+  });
+
+  it('TC-GUARD-COLUMN: soltar sobre el ID de la columna mueve la tarjeta al final', () => {
+    const result = reorderInColumn(tasks(), 'To Do', 'task-1', 'To Do');
+    const col = getColumnTasks(result, 'To Do');
+    expect(col.map((t) => t.id)).toEqual([2, 3, 1]);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -72,15 +87,12 @@ describe('reorderInColumn', () => {
 // ---------------------------------------------------------------------------
 describe('transferTask', () => {
   it('TC-7: inserta la tarjeta antes de la tarjeta destino en otra columna', () => {
-    // Mover task-1 (To Do) → In Progress, antes de task-4
     const result = transferTask(tasks(), 'task-1', 'In Progress', 'task-4');
     const col = getColumnTasks(result, 'In Progress');
-    // Debe quedar: task-1, task-4, task-5
     expect(col.map((t) => t.id)).toEqual([1, 4, 5]);
   });
 
   it('TC-8: transfiere a columna vacía (CL-1) → la tarjeta queda sola', () => {
-    // Eliminar las tareas de Done para simular columna vacía
     const withoutDone = tasks().filter((t) => t.status !== 'Done');
     const result = transferTask(withoutDone, 'task-1', 'Done', 'Done');
     const col = getColumnTasks(result, 'Done');
@@ -88,7 +100,7 @@ describe('transferTask', () => {
     expect(col[0].id).toBe(1);
   });
 
-  it('TC-9: devuelve la lista sin cambios si la tarjeta activa no existe', () => {
+  it('TC-9: devuelve la lista sin cambios si la tarjeta activa no existe (sin acceder a .status)', () => {
     const original = tasks();
     const result = transferTask(original, 'task-99', 'In Progress', 'task-4');
     expect(result).toBe(original);
@@ -108,10 +120,42 @@ describe('transferTask', () => {
   });
 
   it('TC-12: insertar con overId=Status añade la tarjeta al final del bloque destino', () => {
-    // Mover task-1 (To Do) → In Progress usando el Status como overId
     const result = transferTask(tasks(), 'task-1', 'In Progress', 'In Progress');
     const col = getColumnTasks(result, 'In Progress');
-    // task-4, task-5 ya estaban; task-1 se añade al final
     expect(col.map((t) => t.id)).toEqual([4, 5, 1]);
+  });
+
+  it('TC-GUARD-2: nunca introduce un elemento undefined en el array resultante', () => {
+    const corruptedTasks = [
+      ...tasks(),
+      undefined as unknown as Task,
+      null as unknown as Task,
+    ];
+    const result = transferTask(corruptedTasks, 'task-1', 'In Progress', 'task-4');
+    expect(result.every((t) => t !== undefined && t !== null)).toBe(true);
+    expect(result.some((t) => t === undefined)).toBe(false);
+  });
+
+  it('TC-GUARD-3: preserva estrictamente los IDs sin mutarlos', () => {
+    const original = tasks();
+    const originalIds = original.map((t) => t.id);
+    const result = transferTask(original, 'task-2', 'Done', 'task-6');
+    const resultIds = result.map((t) => t.id);
+
+    // Mismo conjunto de IDs exactamente
+    expect(resultIds.sort((a, b) => a - b)).toEqual(originalIds.sort((a, b) => a - b));
+
+    // La tarjeta transferida mantiene su ID inalterado
+    const transferred = result.find((t) => t.id === 2);
+    expect(transferred).toBeDefined();
+    expect(transferred?.id).toBe(2);
+    expect(transferred?.status).toBe('Done');
+  });
+
+  it('TC-GUARD-4: retorna el array seguro si los parámetros son inválidos', () => {
+    const original = tasks();
+    expect(transferTask(null as unknown as Task[], 'task-1', 'Done', 'Done')).toEqual([]);
+    expect(transferTask(original, '', 'Done', 'Done')).toBe(original);
+    expect(transferTask(original, 'task-1', '' as unknown as Status, 'Done')).toBe(original);
   });
 });

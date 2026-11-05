@@ -53,7 +53,7 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
 
 ## Bloque D — Componentes visuales
 
-- [ ] **T6. Crear `src/kanban/components/Board/DragOverlayCard.tsx`.** RF-1.3, HU-3
+- [x] **T6. Crear `src/kanban/components/Board/DragOverlayCard.tsx`.** RF-1.3, HU-3
   - Reutilizar el marcado visual de `KanbanCard` sin `useSortable`.
   - Aplicar clases Tailwind de vuelo: `rotate-1 shadow-xl opacity-95 scale-[1.02]`.
   - Props: `interface Props { task: Task }`.

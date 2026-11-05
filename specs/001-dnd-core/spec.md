@@ -1,5 +1,5 @@
 # Spec 001 — Drag & Drop Core con @dnd-kit
-Estado: aprobada
+Estado: implementada
 
 ## Contexto y objetivo
 El tablero Kanban cuenta con una interfaz visual maquetada y un estado básico en Zustand, pero las tarjetas permanecen estáticas. El objetivo de esta spec es dotar al tablero de interactividad táctil y de ratón completa mediante `@dnd-kit`, permitiendo reordenar tarjetas dentro de la misma columna y transferirlas fluidamente entre columnas distintas sin recargar la página ni mutar el estado de forma destructiva.

@@ -3,30 +3,25 @@
 ## Estado Actual
 - [x] Repositorio Git inicializado y vinculado.
 - [x] Configuración base de Vite + React 19 + TypeScript.
-- [x] Tailwind CSS v4. `src/index.css` actualizado con variables de globals.css de v0 (incluye bloque `@media prefers-color-scheme: dark`). `src/App.css` eliminado.
-- [x] Skills SDD y directrices copiadas en `.agents/skills/`.
-- [x] `AGENTS.md` y `docs/constitution.md` confirmados.
-- [x] `tsconfig.app.json` corregido: `baseUrl` + `paths` para alias `@/*`; `erasableSyntaxOnly` eliminado (TS ~5.7.3 no lo soporta). `npx tsc --noEmit` pasa limpio.
-- [x] Dependencias del tablero instaladas (`@dnd-kit`, `zustand`, `lucide-react`, `shadcn`, `class-variance-authority`, etc.).
-- [x] Maqueta v0 refactorizada e integrada:
-  - `src/interfaces/kanban.interface.ts` → `Task`, `Column`, `Status`, `Priority`.
-  - `src/kanban/store/kanban.store.ts` → Zustand con persistencia `'kanban-storage'`.
-  - `src/kanban/components/Card/KanbanCard.tsx`
-  - `src/kanban/components/Column/KanbanColumn.tsx`
-  - `src/kanban/components/Board/BoardHeader.tsx`
-  - `src/kanban/pages/BoardPage.tsx`
-  - `src/App.tsx` → monta `<BoardPage />`.
-- [ ] Implementar DnD completo (`useKanbanDnd`, `DragOverlay`) — Spec 001 pendiente.
-- [ ] Añadir SearchInput, PriorityFilter, TagFilter (Controls).
+- [x] Tailwind CSS v4 con variables y directivas de diseño v0.
+- [x] Manifiesto `AGENTS.md` y `docs/constitution.md` aprobados.
+- [x] Spec 001 implementada y validada (`specs/001-dnd-core/`):
+  - Lógica pura: `src/kanban/core/reorder.ts` (`reorderInColumn`, `transferTask`, `getColumnTasks`).
+  - Tests unitarios: `src/kanban/core/__tests__/reorder.test.ts` (12/12 en verde).
+  - Store: `reorderTasks` en Zustand con persistencia en `localStorage['kanban-storage']`.
+  - Hook & DnD: `useKanbanDnd`, `<DndContext>`, `closestCorners`, `DragOverlay` y `DragOverlayCard`.
+  - Componentes accesibles e interactivos con soporte de teclado y puntero (`PointerSensor`, `KeyboardSensor`).
+- [ ] Spec 002 pendiente: Controles, filtros por texto/prioridad/tags y acciones en columna.
 
 ## Decisiones Clave de Arquitectura
-- **2026-11-04:** Adopción estricta de la metodología SDD (*Spec-Driven Development*).
-- **2026-11-04:** Arquitectura modular por dominios centrada en `src/kanban/` (`interfaces` -> `core` -> `store` -> `components`).
-- **2026-11-04:** Modelo de datos normalizado; las tareas usan `status: Status` como referencia a columna. Migración a `columnId` prevista al implementar DnD completo.
-- **2026-11-04:** `@dnd-kit` con `<DragOverlay>` para el arrastre — pendiente de implementar.
+- **2026-11-04:** Adopción estricta de SDD (*Spec-Driven Development*).
+- **2026-11-05:** Colocalización de tests unitarios del core en `src/kanban/core/__tests__/` (constitution.md §1).
+- **2026-11-05:** `UniqueId` como string formateado (`'task-{id}'` vs `Status`) para evitar colisiones entre tarjetas y columnas droppables.
+- **2026-11-05:** Actualización optimista inter-columna en `handleDragOver` y commit en `handleDragEnd` para 60 FPS estables sin tirones visuales.
+- **2026-11-05:** Reemplazo de `moveTask` por `reorderTasks(Task[])` en el store, asegurando que la posición ordinal en el array sea la única fuente de verdad.
 
 ## Errores a Evitar
-- No importar `@/kanban/*` sin que `tsconfig.app.json` tenga `baseUrl` y `paths` (el raíz no se hereda al pasar `--project`).
-- No acoplar DnD directamente en `KanbanCard`; mantener en hooks dedicados.
-- Nunca mutar arrays en el store; siempre desestructuración inmutable.
-- Prohibido `any` y usar índices de array como claves React o IDs de sensores DnD.
+- No importar módulos fuera de su dominio sin contrato tipado en `interfaces/`.
+- No usar `closestCenter` en tableros Kanban con columnas vacías; usar `closestCorners`.
+- No pasar índices de array numéricos a `useSortable`; usar siempre identificadores estables `task-${id}`.
+- Nunca mutar arrays directamente en las acciones del store ni en los eventos de DnD; utilizar siempre desestructuración o utilidades inmutables.

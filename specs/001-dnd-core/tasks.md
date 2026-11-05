@@ -1,5 +1,5 @@
 # Tasks 001 — Drag & Drop Core con @dnd-kit
-Estado: pendiente  
+Estado: completada  
 Plan: `specs/001-dnd-core/plan.md` (aprobado)
 
 ---
@@ -91,7 +91,7 @@ Plan: `specs/001-dnd-core/plan.md` (aprobado)
   - Pasar `npm run lint` con 0 warnings ni errores.
   - Hecho cuando: todos los criterios de finalización de `spec.md` están marcados en verde.
 
-- [ ] **T11. Actualizar `MEMORY.md` y marcar la spec como implementada.**
+- [x] **T11. Actualizar `MEMORY.md` y marcar la spec como implementada.**
   - Cambiar `Estado: aprobada` → `Estado: implementada` en `specs/001-dnd-core/spec.md`.
   - Registrar en `MEMORY.md`: decisiones tomadas, archivos creados/modificados y errores a evitar.
   - Hecho cuando: `MEMORY.md` y `spec.md` reflejan el estado final de la implementación.

@@ -6,7 +6,7 @@ Estado: pendiente
 - [x] **T1. Contratos de TypeScript para actualización y validación en `src/interfaces/kanban.interface.ts`.** RF-2.1, RF-2.5, RNF-3
   - Hecho cuando: `npx tsc --noEmit` compila limpiamente exportando `UpdateTaskPayload`, `ValidationResult<T>` y `TaskPayloadValidationResult` sin tipos implícitos ni `any`.
 
-- [ ] **T2. Funciones puras de validación y sanitización en `src/kanban/core/validator.ts`.** RF-2.2, RF-3.1, RF-3.3, CL-2
+- [x] **T2. Funciones puras de validación y sanitización en `src/kanban/core/validator.ts`.** RF-2.2, RF-3.1, RF-3.3, CL-2
   - Hecho cuando: `validateTaskTitle`, `validateTag`, `sanitizeTags` y `validateTaskPayload` están implementadas como funciones matemáticas puras sin dependencias de React ni Zustand.
 
 - [ ] **T3. Suite de tests unitarios para validadores en `src/kanban/core/__tests__/validator.test.ts`.** RF-2.2, RF-3.3, CL-2

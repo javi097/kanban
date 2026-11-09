@@ -9,7 +9,7 @@ Estado: pendiente
 - [x] **T2. Funciones puras de validación y sanitización en `src/kanban/core/validator.ts`.** RF-2.2, RF-3.1, RF-3.3, CL-2
   - Hecho cuando: `validateTaskTitle`, `validateTag`, `sanitizeTags` y `validateTaskPayload` están implementadas como funciones matemáticas puras sin dependencias de React ni Zustand.
 
-- [ ] **T3. Suite de tests unitarios para validadores en `src/kanban/core/__tests__/validator.test.ts`.** RF-2.2, RF-3.3, CL-2
+- [x] **T3. Suite de tests unitarios para validadores en `src/kanban/core/__tests__/validator.test.ts`.** RF-2.2, RF-3.3, CL-2
   - Hecho cuando: `npx vitest run src/kanban/core/__tests__/validator.test.ts` pasa al 100% cubriendo `TC-VAL-1` a `TC-VAL-12` (títulos vacíos, espacios, unicidad insensible a mayúsculas/minúsculas y longitud máxima).
 
 - [ ] **T4. Ampliación inmutable del store Zustand con `updateTask`, `deleteTask` y `selectedTaskId` en `src/kanban/store/kanban.store.ts`.** RF-2.4, RF-2.5, RF-4.3, RF-5.1, RNF-2, CL-3

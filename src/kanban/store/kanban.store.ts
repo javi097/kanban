@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Task, Status } from '@/interfaces/kanban.interface';
+import type { Task, Status, UpdateTaskPayload } from '@/interfaces/kanban.interface';
+import { validateTaskPayload } from '@/kanban/core/validator';
 
 const INITIAL_TASKS: Task[] = [
   {
@@ -68,9 +69,13 @@ const INITIAL_TASKS: Task[] = [
 interface KanbanState {
   tasks: Task[];
   addingTo: Status | null;
+  selectedTaskId: number | null;
 
   setAddingTo: (status: Status | null) => void;
+  setSelectedTaskId: (id: number | null) => void;
   addTask: (title: string, status: Status) => void;
+  updateTask: (id: number, payload: UpdateTaskPayload) => void;
+  deleteTask: (id: number) => void;
   reorderTasks: (newTasks: Task[]) => void;
 }
 
@@ -79,9 +84,13 @@ export const useKanbanStore = create<KanbanState>()(
     (set) => ({
       tasks: INITIAL_TASKS,
       addingTo: null,
+      selectedTaskId: null,
 
       setAddingTo: (status) =>
         set({ addingTo: status }),
+
+      setSelectedTaskId: (id) =>
+        set({ selectedTaskId: id }),
 
       addTask: (title, status) => {
         const trimmed = title.trim();
@@ -97,6 +106,28 @@ export const useKanbanStore = create<KanbanState>()(
         set((state) => ({ tasks: [...state.tasks, newTask], addingTo: null }));
       },
 
+      updateTask: (id, payload) => {
+        const currentTasks = useKanbanStore.getState().tasks;
+        const targetTask = currentTasks.find((t) => t && t.id === id);
+        if (!targetTask) return;
+
+        const validation = validateTaskPayload(payload);
+        if (!validation.isValid) return;
+
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === id ? { ...task, ...validation.sanitizedPayload, id: task.id } : task,
+          ),
+        }));
+      },
+
+      deleteTask: (id) => {
+        set((state) => ({
+          tasks: state.tasks.filter((task) => task && task.id !== id),
+          selectedTaskId: state.selectedTaskId === id ? null : state.selectedTaskId,
+        }));
+      },
+
       reorderTasks: (newTasks) => {
         if (!Array.isArray(newTasks)) return;
         const validTasks = newTasks.filter(
@@ -107,10 +138,11 @@ export const useKanbanStore = create<KanbanState>()(
     }),
     {
       name: 'kanban-storage',
+      partialize: (state) => ({ tasks: state.tasks }),
       migrate: (persistedState: unknown) => {
         const state = persistedState as { tasks?: Task[] } | undefined;
         if (!state || !Array.isArray(state.tasks)) {
-          return { tasks: INITIAL_TASKS, addingTo: null };
+          return { tasks: INITIAL_TASKS, addingTo: null, selectedTaskId: null };
         }
         const validTasks = state.tasks.filter(
           (t): t is Task => Boolean(t && typeof t.id === 'number' && t.status),
@@ -118,6 +150,8 @@ export const useKanbanStore = create<KanbanState>()(
         return {
           ...state,
           tasks: validTasks.length > 0 ? validTasks : INITIAL_TASKS,
+          addingTo: null,
+          selectedTaskId: null,
         };
       },
     },

@@ -12,7 +12,7 @@
   - Hook & DnD: `useKanbanDnd` sin mutación mid-drag en `handleDragOver` (previene "Maximum update depth exceeded"), commit atómico en `handleDragEnd`.
   - Detección de colisiones: híbrida determinista (`pointerWithin` -> `rectIntersection` -> `closestCorners`).
   - Resiliencia UI: `ErrorBoundary` en `src/components/custom/ErrorBoundary.tsx` envolviendo `App.tsx`.
-- [ ] Spec 002 pendiente: Controles, filtros por texto/prioridad/tags y acciones en columna.
+- [ ] Spec 002 en progreso: Plan aprobado y tareas desglosadas en `specs/002-task-crud-and-modal/tasks.md` (T1 a T10).
 
 ## Decisiones Clave de Arquitectura
 - **2026-11-04:** Adopción estricta de SDD (*Spec-Driven Development*).

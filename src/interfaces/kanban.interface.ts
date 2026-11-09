@@ -23,3 +23,25 @@ export interface Column {
   name: Status;
   color: string;
 }
+
+export interface UpdateTaskPayload {
+  title?: string;
+  description?: string;
+  priority?: Priority;
+  status?: Status;
+  tags?: string[];
+  due?: string;
+}
+
+export interface ValidationResult<T = string> {
+  isValid: boolean;
+  error?: string;
+  sanitized: T;
+}
+
+export interface TaskPayloadValidationResult {
+  isValid: boolean;
+  errors: Partial<Record<keyof UpdateTaskPayload, string>>;
+  sanitizedPayload: UpdateTaskPayload;
+}
+

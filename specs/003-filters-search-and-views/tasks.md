@@ -12,7 +12,7 @@ Estado: pendiente
 - [x] **T3. Suite de tests unitarios para filtrado en `src/kanban/core/__tests__/filter.test.ts`.** RF-1.2, RF-1.3, RF-2.2, RNF-1, CL-1, CL-2, CL-3, CL-4
   - Hecho cuando: `npx vitest run src/kanban/core/__tests__/filter.test.ts` pasa al 100% cubriendo `TC-FILT-1` a `TC-FILT-14` (normalización NFD, insensibilidad a tildes/caja, búsquedas vacías, lógica combinatoria AND/OR, inmutabilidad y etiquetas dinámicas).
 
-- [ ] **T4. Primitiva UI accesible `popover.tsx` en `src/components/ui/popover.tsx`.** RF-2.1, RNF-4
+- [x] **T4. Primitiva UI accesible `popover.tsx` en `src/components/ui/popover.tsx`.** RF-2.1, RNF-4
   - Hecho cuando: Se exportan `PopoverRoot`, `PopoverTrigger`, `PopoverContent` y `PopoverClose` basados en `@base-ui/react/popover` con estilos Tailwind, animaciones suaves, portales y soporte de foco WAI-ARIA.
 
 - [ ] **T5. Ampliación del store Zustand con filtros y modo de vista en `src/kanban/store/kanban.store.ts`.** RF-1.1, RF-2.2, RF-2.3, RF-3.1, RF-3.5

@@ -1,5 +1,5 @@
 # Spec 002 — Gestión CRUD y Detalle de Tarea
-Estado: aprobado
+Estado: implementada
 
 ## Contexto y objetivo
 El tablero permite arrastrar y soltar tarjetas, pero los usuarios no pueden inspeccionar en profundidad su contenido, editar detalles existentes ni eliminar tareas de forma controlada. El objetivo de esta spec es dotar al tablero de capacidades completas de gestión CRUD (crear, leer, actualizar y borrar), integrando un modal de detalle accesible y edición inline, asegurando la persistencia y la inmutabilidad de los datos.

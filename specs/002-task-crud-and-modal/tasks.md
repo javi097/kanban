@@ -1,5 +1,5 @@
 # Tareas — Spec 002: Gestión CRUD y Detalle de Tarea
-Estado: pendiente
+Estado: completada
 
 ## Lista de Tareas Atómicas
 
@@ -30,5 +30,5 @@ Estado: pendiente
 - [x] **T9. Desacoplamiento de clic vs arrastre y menú de opciones en `KanbanCard.tsx`.** RF-1.1, RF-4.1, CL-1
   - Hecho cuando: Hacer clic en una tarjeta abre el modal (`setSelectedTaskId`) sin dispararse durante arrastres (`isDragging` o desplazamiento > 5px), y el botón de opciones no propaga el evento de clic.
 
-- [ ] **T10. Integración en `BoardPage.tsx` y verificación end-to-end con tests, linter, build y navegador.** RF-1.1 a RF-5.1, CL-1 a CL-3
+- [x] **T10. Integración en `BoardPage.tsx` y verificación end-to-end con tests, linter, build y navegador.** RF-1.1 a RF-5.1, CL-1 a CL-3
   - Hecho cuando: `CardDetailModal` se monta en `BoardPage`, `npx vitest run`, `npx tsc --noEmit`, `npm run lint` y `npm run build` pasan limpios, y se verifica en el navegador la persistencia completa tras recargar.

@@ -11,6 +11,7 @@ import type { LucideIcon } from 'lucide-react';
 import { BoardHeader } from '@/kanban/components/Board/BoardHeader';
 import { KanbanColumn } from '@/kanban/components/Column/KanbanColumn';
 import { DragOverlayCard } from '@/kanban/components/Board/DragOverlayCard';
+import { CardDetailModal } from '@/kanban/components/Card/CardDetailModal';
 import { useKanbanDnd } from '@/kanban/hooks/useKanbanDnd';
 import { useKanbanStore } from '@/kanban/store/kanban.store';
 import type { Status } from '@/interfaces/kanban.interface';
@@ -95,6 +96,8 @@ export function BoardPage() {
             {activeTask ? <DragOverlayCard task={activeTask} /> : null}
           </DragOverlay>
         </DndContext>
+
+        <CardDetailModal />
 
         <footer className="flex items-center justify-between pt-7 text-[11px] text-[#aaa9a5]">
           <span>Last updated just now</span>

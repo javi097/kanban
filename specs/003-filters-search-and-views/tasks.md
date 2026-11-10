@@ -6,7 +6,7 @@ Estado: pendiente
 - [x] **T1. Contratos de TypeScript para filtros y modo de vista en `src/interfaces/kanban.interface.ts`.** RF-1.2, RF-3.1, RNF-3
   - Hecho cuando: `npx tsc --noEmit` compila limpiamente exportando `KanbanViewMode` y `KanbanFilters` con tipado estricto sin `any`.
 
-- [ ] **T2. Funciones puras de filtrado, normalización y cálculo de etiquetas en `src/kanban/core/filter.ts`.** RF-1.2, RF-1.3, RF-2.2, RNF-1, CL-3, CL-4
+- [x] **T2. Funciones puras de filtrado, normalización y cálculo de etiquetas en `src/kanban/core/filter.ts`.** RF-1.2, RF-1.3, RF-2.2, RNF-1, CL-3, CL-4
   - Hecho cuando: `normalizeSearchText`, `matchesSearch`, `matchesPriorities`, `matchesTags`, `filterTasks`, `getAvailableTags`, `countActiveFilters` y `hasActiveFilters` están implementadas como funciones matemáticas puras sin dependencias de React ni Zustand.
 
 - [ ] **T3. Suite de tests unitarios para filtrado en `src/kanban/core/__tests__/filter.test.ts`.** RF-1.2, RF-1.3, RF-2.2, RNF-1, CL-1, CL-2, CL-3, CL-4

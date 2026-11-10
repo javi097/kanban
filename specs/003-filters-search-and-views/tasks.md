@@ -18,10 +18,10 @@ Estado: pendiente
 - [x] **T5. Ampliación del store Zustand con filtros y modo de vista en `src/kanban/store/kanban.store.ts`.** RF-1.1, RF-2.2, RF-2.3, RF-3.1, RF-3.5
   - Hecho cuando: El store gestiona `viewMode`, `filters` y las acciones `setViewMode`, `setSearchQuery`, `togglePriorityFilter`, `toggleTagFilter` y `clearFilters` de forma inmutable, aislados de `localStorage` mediante `partialize`.
 
-- [ ] **T6. Componente de búsqueda reactiva `SearchInput.tsx` en `src/kanban/components/Controls/SearchInput.tsx`.** RF-1.1, RF-1.3, CL-3, CL-4
+- [x] **T6. Componente de búsqueda reactiva `SearchInput.tsx` en `src/kanban/components/Controls/SearchInput.tsx`.** RF-1.1, RF-1.3, CL-3, CL-4
   - Hecho cuando: El componente renderiza un campo accesible con botón para limpiar texto (`X`), tecla `Escape` para cerrar/limpiar y conexión reactiva con `setSearchQuery`.
 
-- [ ] **T7. Panel flotante de filtros `BoardFilterPopover.tsx` en `src/kanban/components/Controls/BoardFilterPopover.tsx`.** RF-2.1, RF-2.2, RF-2.3, CL-2
+- [x] **T7. Panel flotante de filtros `BoardFilterPopover.tsx` en `src/kanban/components/Controls/BoardFilterPopover.tsx`.** RF-2.1, RF-2.2, RF-2.3, CL-2
   - Hecho cuando: El popover incluye botón disparador con badge numérico de criterios activos, selectores de prioridad (`CardPriorityBadge`), etiquetas dinámicas (`getAvailableTags`) y botón "Limpiar filtros".
 
 - [ ] **T8. Integración de controles en `BoardHeader.tsx` y estado vacío amigable en `KanbanColumn.tsx`.** RF-1.1, RF-1.4, RF-2.1, RF-4.1, CL-1

@@ -13,7 +13,7 @@
   - UI Accesible: `dialog.tsx` y `alert-dialog.tsx` (`@base-ui/react`), `ConfirmDialog.tsx`, `CardPriorityBadge.tsx`, `CardTag.tsx`.
   - Componente modal: `CardDetailModal.tsx` con edición inline, validación reactiva y borrado defensivo.
   - Integración: clic vs arrastre desacoplado en `KanbanCard.tsx` y montaje en `BoardPage.tsx`.
-- [ ] Spec 003 pendiente: Controles, filtros por texto/prioridad/tags y acciones en columna.
+- [ ] Spec 003 en progreso: Plan aprobado y tareas desglosadas en `specs/003-filters-search-and-views/tasks.md` (T1 a T10).
 
 ## Decisiones Clave de Arquitectura
 - **2026-11-04:** Adopción estricta de SDD (*Spec-Driven Development*).

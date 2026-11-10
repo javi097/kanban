@@ -1,0 +1,454 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+plan.md
+spec.md
+tasks.md
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="plan.md">
+# Plan Técnico — Spec 003: Filtros, Búsqueda y Vistas Alternativas
+Estado: borrador
+
+## 1. Resumen de Arquitectura y Enfoque
+
+El objetivo de la Spec 003 es incorporar capacidades de búsqueda reactiva en tiempo real, filtrado combinatorio por prioridad y etiquetas dinámicas, y una vista alternativa en lista ("List view") junto a la vista de cuadrícula ("Board view").
+
+Para preservar los principios innegociables de la [Constitución](file:///c:/Users/javig/Documents/React/Kanban/kanban/docs/constitution.md) y [`AGENTS.md`](file:///c:/Users/javig/Documents/React/Kanban/kanban/AGENTS.md):
+- **Pureza en el core:** Toda la lógica de normalización de cadenas, coincidencia de criterios y evaluación combinatoria se implementa como funciones 100% puras en `src/kanban/core/filter.ts`, acompañadas de su suite de tests unitarios en `src/kanban/core/__tests__/filter.test.ts`.
+- **UI accesible sin dependencias pesadas:** El panel de filtros se apoya en `@base-ui/react/popover` (ya disponible en el proyecto), encapsulado en `src/components/ui/popover.tsx` con estilos Tailwind y atributos WAI-ARIA nativos.
+- **Estado predecible y volátil:** El estado de los filtros (`searchQuery`, `priorities`, `tags`) y el modo de vista (`viewMode: 'board' | 'list'`) se incorporan en `src/kanban/store/kanban.store.ts`. Gracias a la configuración existente de `partialize: (state) => ({ tasks: state.tasks })`, este estado de sesión no se persiste en `localStorage['kanban-storage']`, evitando que el usuario vuelva en futuras sesiones a un tablero bloqueado por una búsqueda olvidada.
+- **Integridad con Drag & Drop:** En la vista "Board", el drag & drop opera entre las tarjetas visibles filtradas sin corromper el orden ni los datos de las tarjetas ocultas. En la vista "List", el drag & drop permanece desactivado por diseño para ofrecer una experiencia tabular optimizada de consulta rápida.
+
+---
+
+## 2. Árbol de Archivos y Responsabilidades
+
+```text
+src/
+├── components/
+│   └── ui/
+│       ├── button.tsx                     # [Existente] Primitiva Button (@base-ui/react/button)
+│       ├── dialog.tsx                     # [Existente] Primitiva Dialog (@base-ui/react/dialog)
+│       ├── alert-dialog.tsx               # [Existente] Primitiva AlertDialog (@base-ui/react/alert-dialog)
+│       └── popover.tsx                    # [Nuevo] Primitiva Popover accesible (@base-ui/react/popover)
+├── interfaces/
+│   └── kanban.interface.ts                # [Modificado] Contratos KanbanFilters y KanbanViewMode
+└── kanban/
+    ├── components/
+    │   ├── Board/
+    │   │   ├── BoardHeader.tsx            # [Modificado] Integra SearchInput y BoardFilterPopover
+    │   │   ├── DragOverlayCard.tsx        # [Existente] Visualización overlay durante drag
+    │   │   └── KanbanBoard.tsx            # [Opcional/Modificado] Cuadrícula de columnas DnD
+    │   ├── Column/
+    │   │   └── KanbanColumn.tsx           # [Modificado] Renderizado de tareas filtradas y estado vacío
+    │   ├── Card/
+    │   │   ├── KanbanCard.tsx             # [Existente] Tarjeta arrastrable con click desacoplado
+    │   │   ├── CardPriorityBadge.tsx      # [Existente] Badge visual de prioridad
+    │   │   ├── CardTag.tsx                # [Existente] Chip de etiqueta
+    │   │   └── CardDetailModal.tsx        # [Existente] Modal de detalle e inspección
+    │   ├── Controls/
+    │   │   ├── SearchInput.tsx            # [Nuevo] Campo de búsqueda reactiva con botón limpiar (X)
+    │   │   └── BoardFilterPopover.tsx     # [Nuevo] Panel flotante con selector de prioridad, tags y botón limpiar
+    │   └── List/
+    │       └── ListView.tsx               # [Nuevo] Vista tabular organizada por columnas/estado
+    ├── core/
+    │   ├── reorder.ts                     # [Existente] Lógica pura de reordenación intra/inter-columna
+    │   ├── validator.ts                   # [Existente] Validaciones de CRUD
+    │   ├── filter.ts                      # [Nuevo] Funciones puras de filtrado y normalización
+    │   └── __tests__/
+    │       ├── reorder.test.ts            # [Existente] Tests de reordenación (17 tests)
+    │       ├── validator.test.ts          # [Existente] Tests de validación (15 tests)
+    │       └── filter.test.ts             # [Nuevo] Tests unitarios de filtrado (TC-FILT-1 a TC-FILT-12)
+    ├── pages/
+    │   └── BoardPage.tsx                  # [Modificado] Conmutador de vista, contador contextual y renderizado condicional
+    └── store/
+        └── kanban.store.ts                # [Modificado] Acciones y estado de filtros y modo de vista
+```
+
+---
+
+## 3. Contratos de Datos e Interfaces (`src/interfaces/kanban.interface.ts`)
+
+Se incorporan contratos explícitos para el modo de visualización y el estado de filtrado:
+
+```typescript
+export type KanbanViewMode = 'board' | 'list';
+
+export interface KanbanFilters {
+  searchQuery: string;
+  priorities: Priority[];
+  tags: string[];
+}
+```
+
+---
+
+## 4. Funciones Puras de Lógica (`src/kanban/core/filter.ts`)
+
+En estricto cumplimiento del Principio 4 de la Constitución, estas funciones son 100% deterministas y desacopladas de React y Zustand:
+
+### 4.1. `normalizeSearchText`
+- **Firma:** `(text: unknown) => string`
+- **Comportamiento:**
+  - Si no es string, retorna `""`.
+  - Recorta espacios extremos (`trim()`), pasa a minúsculas (`toLowerCase()`).
+  - Aplica normalización NFD canónica eliminando marcas diacríticas y tildes (`normalize('NFD').replace(/[\u0300-\u036f]/g, '')`).
+
+### 4.2. `matchesSearch`
+- **Firma:** `(task: Task, normalizedQuery: string) => boolean`
+- **Comportamiento:**
+  - Si `normalizedQuery` está vacía, retorna `true`.
+  - Evalúa si el título normalizado o la descripción normalizada de la tarea incluyen `normalizedQuery`.
+
+### 4.3. `matchesPriorities`
+- **Firma:** `(task: Task, selectedPriorities: readonly Priority[]) => boolean`
+- **Comportamiento:**
+  - Si `selectedPriorities.length === 0`, retorna `true` (sin filtro).
+  - Evalúa coincidencia mediante operador lógico **OR** (`selectedPriorities.includes(task.priority)`).
+
+### 4.4. `matchesTags`
+- **Firma:** `(task: Task, selectedTags: readonly string[]) => boolean`
+- **Comportamiento:**
+  - Si `selectedTags.length === 0`, retorna `true` (sin filtro).
+  - Evalúa coincidencia mediante operador lógico **OR inclusivo**: retorna `true` si al menos una de las etiquetas de la tarea coincide (insensible a mayúsculas) con alguna de las seleccionadas en `selectedTags`.
+
+### 4.5. `filterTasks`
+- **Firma:** `(tasks: Task[], filters: KanbanFilters) => Task[]`
+- **Comportamiento:**
+  - Sanitiza parámetros de entrada.
+  - Retorna un nuevo array con las tareas que satisfacen simultáneamente la combinación lógica **AND** (`matchesSearch && matchesPriorities && matchesTags`).
+  - No muta el array original de tareas.
+
+### 4.6. `getAvailableTags`
+- **Firma:** `(tasks: Task[]) => string[]`
+- **Comportamiento:**
+  - Extrae todas las etiquetas de las tareas vivas (`tasks`), elimina duplicados (case-insensitive) y las retorna ordenadas alfabéticamente (CL-2).
+
+### 4.7. `countActiveFilters`
+- **Firma:** `(filters: KanbanFilters) => number`
+- **Comportamiento:**
+  - Retorna la suma de criterios activos: `(filters.searchQuery.trim().length > 0 ? 1 : 0) + filters.priorities.length + filters.tags.length`.
+
+### 4.8. `hasActiveFilters`
+- **Firma:** `(filters: KanbanFilters) => boolean`
+- **Comportamiento:**
+  - Retorna `countActiveFilters(filters) > 0`.
+
+---
+
+## 5. Diseño e Integración de Interfaz
+
+### 5.1. Primitiva `Popover` (`src/components/ui/popover.tsx`)
+- Envoltorio accesible sobre `@base-ui/react/popover`:
+  - `PopoverRoot`, `PopoverTrigger`, `PopoverContent` (con `Portal`, `Positioner` y `Popup`), `PopoverTitle`, `PopoverDescription`, `PopoverClose`.
+  - Animaciones suaves de entrada y salida con `data-[starting-style]` y `data-[ending-style]`.
+  - Captura y restitución de foco WAI-ARIA nativa con cierre al pulsar `Escape` o hacer clic fuera.
+
+### 5.2. Componentes de Control (`src/kanban/components/Controls/`)
+- **`SearchInput.tsx`:**
+  - Renderiza un botón de búsqueda que expande un campo de texto interactivo en la cabecera (o un input inline estilizado).
+  - Muestra un botón con icono `X` para vaciar el texto con un solo clic.
+  - Soporta pulsar `Escape` para limpiar y colapsar el campo.
+- **`BoardFilterPopover.tsx`:**
+  - Botón disparador con icono `SlidersHorizontal` y badge numérico contextual indicando `countActiveFilters(filters)`.
+  - Panel desplegable con dos bloques:
+    1. *Prioridad:* Botones interactivos con `CardPriorityBadge` para alternar ('High', 'Medium', 'Low').
+    2. *Etiquetas:* Listado dinámico obtenido con `getAvailableTags(tasks)` con chips interactivos.
+  - Botón accesible "Limpiar filtros" en la parte inferior, visible cuando `hasActiveFilters(filters)` sea `true`.
+
+### 5.3. Adaptación de `KanbanColumn.tsx`
+- En lugar de filtrar directamente de `useKanbanStore.getState().tasks`, la columna recibe o computa las tareas que pertenecen a su columna y superan `filterTasks`.
+- **Estado vacío amigable (`RF-1.4`, `CL-1`):**
+  - Si la columna tiene tareas en total (`totalColumnTasks > 0`) pero ninguna coincide con los filtros activos (`filteredColumnTasks.length === 0`), renderiza un contenedor informativo con texto tenue: *"Sin tarjetas coincidentes"* y opción de *"Limpiar filtros"*.
+  - La columna mantiene su altura mínima (`min-h-[520px]`) para que el dropzone continúe operativo.
+
+### 5.4. Componente `ListView.tsx` (`src/kanban/components/List/ListView.tsx`)
+- Representación estructurada agrupada por columnas/estado ('To Do', 'In Progress', 'Done').
+- Cada grupo muestra el encabezado con el icono y color de la columna, y una lista de tarjetas horizontales.
+- Cada fila muestra:
+  - Título y extracto de descripción.
+  - Badge de prioridad (`CardPriorityBadge`).
+  - Chips de etiquetas (`CardTag`).
+  - Indicador de fecha límite (`CalendarDays`).
+- Clic en cualquier fila ejecuta `setSelectedTaskId(task.id)` para abrir `CardDetailModal` de forma idéntica a la vista en cuadrícula (`CL-6`).
+- Drag & Drop desactivado por diseño en esta vista (`RF-4.2`).
+
+### 5.5. Conmutador y Contador en `BoardPage.tsx`
+- Botones "Board" y "List" conectados con `viewMode` y `setViewMode`.
+- Contador del sub-encabezado:
+  - Si hay filtros activos: `<span>{filteredTasks.length} de {tasks.length} tarjetas</span>`.
+  - Si no hay filtros: `<span>{tasks.length} tarjetas</span>`.
+- Renderizado condicional del cuerpo principal según `viewMode === 'board'` o `'list'`.
+
+---
+
+## 6. Ampliación del Store (`src/kanban/store/kanban.store.ts`)
+
+### 6.1. Definición del Estado
+```typescript
+interface KanbanState {
+  // Datos existentes
+  tasks: Task[];
+  addingTo: Status | null;
+  selectedTaskId: number | null;
+
+  // Nuevo estado volátil (Spec 003)
+  viewMode: KanbanViewMode;
+  filters: KanbanFilters;
+
+  // Acciones existentes
+  setAddingTo: (status: Status | null) => void;
+  setSelectedTaskId: (id: number | null) => void;
+  addTask: (title: string, status: Status) => void;
+  updateTask: (id: number, payload: UpdateTaskPayload) => void;
+  deleteTask: (id: number) => void;
+  reorderTasks: (newTasks: Task[]) => void;
+
+  // Nuevas acciones (Spec 003)
+  setViewMode: (mode: KanbanViewMode) => void;
+  setSearchQuery: (query: string) => void;
+  togglePriorityFilter: (priority: Priority) => void;
+  toggleTagFilter: (tag: string) => void;
+  clearFilters: () => void;
+}
+```
+
+### 6.2. Inmutabilidad y Persistencia
+- `togglePriorityFilter`: si la prioridad ya está en `filters.priorities`, la elimina con `.filter()`; si no, la añade con `[...prev, p]`.
+- `toggleTagFilter`: si el tag ya está en `filters.tags`, lo elimina; si no, lo añade.
+- `clearFilters`: resetea `filters` a `{ searchQuery: '', priorities: [], tags: [] }`.
+- **Aislamiento en `partialize`:** `partialize: (state) => ({ tasks: state.tasks })` permanece intacto, garantizando que el estado volátil de filtros y vista no ensucie `localStorage`.
+
+---
+
+## 7. Decisiones Técnicas Justificadas
+
+| Decisión Técnica | Justificación | Alternativa Descartada y Motivo |
+| :--- | :--- | :--- |
+| **Primitiva `Popover` con `@base-ui/react/popover`** | Mantiene coherencia con el stack existente (`dialog.tsx`, `alert-dialog.tsx`, `button.tsx`) sin añadir nuevas dependencias a `package.json`, asegurando soporte WAI-ARIA nativo y focus trapping. | Desplegable manual con `useState` y CSS absoluto: Descartada por carecer de accesibilidad WAI-ARIA, portaling sobre z-index y gestión de eventos fuera del contenedor. |
+| **Filtros en el Store Zustand sin persistencia (`partialize`)** | Facilita que `BoardHeader`, `BoardPage`, `KanbanColumn` y `ListView` compartan los filtros sin prop drilling complejo. Se excluye de `localStorage` para evitar que el usuario regrese a un tablero bloqueado por filtros antiguos. | Filtros en estado local con React Context o URL params: Descartada para evitar re-renderizados de context anidados o acoplar la aplicación a un enrutador cuando no hay router instalado. |
+| **Normalización NFD con regex en `core/filter.ts`** | Permite que búsquedas como "diseño", "diseno" o "DISEÑO" encuentren los mismos resultados de forma determinista y pura. | Búsqueda simple con `.includes()`: Descartada porque fallaría con acentos o diferencias de caja en textos en español o inglés. |
+| **Desactivación de DnD en `ListView`** | La vista de lista está concebida para lectura densa, auditoría y revisión rápida; mezclar drag & drop vertical en tabla añade complejidad innecesaria y colisiones de scroll. | Soportar reordenación en ListView: Descartada por sobrediseño innecesario fuera del alcance de la spec (`RF-4.2`). |
+
+---
+
+## 8. Estrategia de Pruebas Unitarias (`src/kanban/core/__tests__/filter.test.ts`)
+
+La suite se ejecutará con `npx vitest run` cubriendo:
+
+- **`normalizeSearchText`**:
+  - `TC-FILT-1`: Elimina espacios en blanco y convierte a minúsculas.
+  - `TC-FILT-2`: Normaliza tildes y caracteres diacríticos (ej. "áéíóúñ" -> "aeioun").
+  - `TC-FILT-3`: Maneja valores no string (`null`, `undefined`, números) retornando string vacío.
+- **`matchesSearch`**:
+  - `TC-FILT-4`: Coincide por título y por descripción indistintamente.
+  - `TC-FILT-5`: Retorna `true` ante búsquedas vacías o compuestas solo por espacios (`CL-3`).
+- **`matchesPriorities`**:
+  - `TC-FILT-6`: Retorna `true` si no hay prioridades seleccionadas.
+  - `TC-FILT-7`: Evalúa con lógica OR para múltiples prioridades seleccionadas (ej. 'High' o 'Medium').
+- **`matchesTags`**:
+  - `TC-FILT-8`: Retorna `true` si no hay etiquetas seleccionadas.
+  - `TC-FILT-9`: Evalúa con lógica OR inclusivo para múltiples etiquetas (coincide si la tarea tiene al menos una).
+- **`filterTasks`**:
+  - `TC-FILT-10`: Combina AND entre texto, prioridad y etiquetas, retornando el subconjunto correcto.
+  - `TC-FILT-11`: Retorna array vacío si no hay coincidencias globales (`CL-1`).
+  - `TC-FILT-12`: No muta el array original de tareas (RNF-1).
+- **`getAvailableTags`**:
+  - `TC-FILT-13`: Extrae etiquetas únicas y ordenadas de las tareas vivas (`CL-2`).
+- **`countActiveFilters` / `hasActiveFilters`**:
+  - `TC-FILT-14`: Calcula la suma correcta de criterios activos.
+
+---
+
+## 9. Matriz de Trazabilidad
+
+| Requisito / Caso Límite | Componente / Archivo | Función / Acción | Prueba Asociada |
+| :--- | :--- | :--- | :--- |
+| **RF-1.1** (Search input con clear y Esc) | `SearchInput.tsx`, `BoardHeader.tsx` | `setSearchQuery` y botón X | Verificación interactiva en navegador |
+| **RF-1.2** (Búsqueda título/descripción) | `filter.ts` | `matchesSearch` | `filter.test.ts` (`TC-FILT-4`) |
+| **RF-1.3** (Insensible a mayúsculas/acentos) | `filter.ts` | `normalizeSearchText` | `filter.test.ts` (`TC-FILT-1`, `TC-FILT-2`) |
+| **RF-1.4** (Estado vacío en columna) | `KanbanColumn.tsx` | Placeholder "Sin tarjetas coincidentes" | Verificación visual y `CL-1` |
+| **RF-2.1** (Popover filtros con prioridad y tags) | `popover.tsx`, `BoardFilterPopover.tsx` | `BoardFilterPopover` | Verificación accesible WAI-ARIA |
+| **RF-2.2** (Badge con contador de filtros) | `BoardFilterPopover.tsx`, `filter.ts` | `countActiveFilters` | `filter.test.ts` (`TC-FILT-14`) |
+| **RF-2.3** (Botón limpiar filtros) | `BoardFilterPopover.tsx`, `kanban.store.ts` | `clearFilters` | Verificación en popover |
+| **RF-2.4** (Contador contextual sub-encabezado) | `BoardPage.tsx` | `X de Y tarjetas` | Verificación visual |
+| **RF-3.1** (Conmutador Board / List) | `BoardPage.tsx`, `kanban.store.ts` | `setViewMode` | Conmutación interactiva |
+| **RF-3.2** (Estilo visual seleccionado en toggle) | `BoardPage.tsx` | Clases Tailwind condicionales | Verificación visual |
+| **RF-3.3** (Estructura de ListView) | `ListView.tsx` | Renderizado tabular por estado | Verificación visual en List |
+| **RF-3.4** (Clic en fila abre CardDetailModal) | `ListView.tsx`, `BoardPage.tsx` | `setSelectedTaskId` | Inspección de tarea desde ListView |
+| **RF-3.5** (Filtros persistentes al cambiar vista) | `kanban.store.ts`, `BoardPage.tsx` | Filtros en store global | Verificación entre vistas |
+| **RF-4.1** (DnD íntegro con filtros activos) | `KanbanColumn.tsx`, `reorder.ts` | Reordenación con tareas ocultas | Suite de `reorder.test.ts` |
+| **RF-4.2** (DnD deshabilitado en List) | `ListView.tsx` | Renderizado plano sin sensores | Verificación de interacción |
+| **CL-1** (Búsqueda sin coincidencias) | `filter.ts`, `KanbanColumn.tsx` | Retorno de `[]` y placeholders | `TC-FILT-11` y verificación UI |
+| **CL-2** (Etiquetas dinámicas tras borrado) | `filter.ts`, `BoardFilterPopover.tsx` | `getAvailableTags` | `TC-FILT-13` |
+| **CL-3** (Espacios en blanco en búsqueda) | `filter.ts` | Sanitización `.trim()` | `TC-FILT-5` |
+| **CL-4** (Tildes y caracteres diacríticos) | `filter.ts` | Normalización NFD | `TC-FILT-2` |
+| **CL-5** (Añadir tarjeta con filtros activos) | `kanban.store.ts`, `KanbanColumn.tsx` | `addTask` inmutable | Creación y actualización de contador |
+| **CL-6** (Apertura de modal desde fila ListView) | `ListView.tsx` | `setSelectedTaskId` | Verificación interactiva |
+</file>
+
+<file path="spec.md">
+# Spec 003 — Filtros, Búsqueda y Vistas Alternativas
+Estado: aprobado
+
+## Contexto y objetivo
+El tablero Kanban permite arrastrar tarjetas y gestionar su contenido mediante CRUD completo (Spec 001 y Spec 002), pero carece de herramientas de localización cuando el volumen de tareas crece. El objetivo de esta spec es dotar al espacio de trabajo de búsqueda reactiva por texto, filtrado acumulativo por prioridad y etiquetas, e incorporar una vista alternativa en lista ("List view") junto a la vista actual en columnas ("Board view"), manteniendo la accesibilidad WAI-ARIA, la pureza matemática en el filtrado y la integridad del drag & drop.
+
+## Usuarios
+- **Usuario del tablero:** necesita localizar rápidamente tareas urgentes o de un área concreta mediante filtros combinados y alternar a vista de lista para una lectura rápida o auditoría secuencial del flujo de trabajo.
+
+## Historias de usuario
+- **HU-1.** Como usuario, quiero buscar por texto en tiempo real para ver únicamente las tarjetas cuyo título o descripción contengan el término buscado.
+- **HU-2.** Como usuario, quiero filtrar por una o varias prioridades ('High', 'Medium', 'Low') para focalizar las tareas según su criticidad.
+- **HU-3.** Como usuario, quiero filtrar por una o varias etiquetas para centrarme en áreas de especialidad concretas (ej. 'Design', 'Engineering').
+- **HU-4.** Como usuario, quiero ver un indicador visual con el número de filtros activos y poder restablecerlos con un solo clic.
+- **HU-5.** Como usuario, quiero conmutar entre la vista "Board" (columnas Kanban) y la vista "List" (tabla/lista agrupada por estado) conservando los filtros activos.
+- **HU-6.** Como usuario, quiero hacer clic en cualquier tarjeta tanto desde la vista "Board" como desde la vista "List" para abrir su modal de detalle e inspección (`CardDetailModal`).
+
+## Definiciones
+- **Filtro Combinatorio:**
+  - **Entre categorías:** Operación lógica **AND** (la tarjeta debe coincidir con el texto de búsqueda Y con las prioridades seleccionadas Y con las etiquetas seleccionadas).
+  - **Dentro de Prioridades (multiselección):** Operación lógica **OR** (si se seleccionan 'High' y 'Medium', la tarjeta es válida si su prioridad es 'High' O 'Medium').
+  - **Dentro de Etiquetas (multiselección):** Operación lógica **OR inclusiva** (si se seleccionan 'Design' y 'Engineering', la tarjeta es válida si contiene al menos una de las etiquetas seleccionadas).
+- **Vista Lista (`ListView`):** Representación vertical estructurada de las tareas agrupadas por estado ('To Do', 'In Progress', 'Done'), optimizada para lectura rápida, orden y auditoría sin drag & drop.
+- **Estado de Filtrado Volátil:** Filtros aplicados en memoria en la sesión activa; no se persisten en `localStorage` para evitar que recargas posteriores muestren tableros vacíos por búsquedas olvidadas.
+- **Modo de Vista (`ViewMode`):** Estado de visualización activo (`'board'` | `'list'`).
+
+## Requisitos funcionales
+
+### RF-1 — Búsqueda reactiva por texto
+- **RF-1.1.** El botón de búsqueda de la cabecera deberá desplegar o enfocar un campo de entrada accesible (`SearchInput`) con botón para borrar el texto (`X`) y soporte para cerrar con la tecla `Escape`.
+- **RF-1.2.** La búsqueda evaluará en tiempo real coincidencias sobre el título y la descripción de cada tarjeta.
+- **RF-1.3.** La comparación será insensible a mayúsculas/minúsculas y diacríticos/acentos (ej. "diseño" coincidirá con "Diseno" o "DISEÑO").
+- **RF-1.4.** Si una columna no contiene tarjetas que coincidan con la búsqueda activa, mostrará un estado vacío informativo ("Sin tarjetas coincidentes") sin deformar el ancho ni la altura mínima de la columna.
+
+### RF-2 — Filtrado por Prioridad y Etiquetas
+- **RF-2.1.** El botón "Filter board" desplegará un panel flotante accesible (`Popover` basado en `@base-ui/react/popover`) con dos secciones:
+  - **Prioridad:** checkboxes o selectores para 'High', 'Medium', 'Low' acompañados de sus badges visuales (`CardPriorityBadge`).
+  - **Etiquetas:** listado dinámico de las etiquetas existentes en el tablero extraídas de las tarjetas actuales.
+- **RF-2.2.** El botón de filtro mostrará un badge numérico con la cantidad total de criterios activos cuando haya filtros aplicados (ej. `2` si hay 1 prioridad y 1 tag seleccionados).
+- **RF-2.3.** El panel de filtros incluirá un botón "Limpiar filtros" visible cuando haya criterios activos, restableciendo instantáneamente la búsqueda, prioridades y etiquetas.
+- **RF-2.4.** El sub-encabezado del tablero actualizará el contador general reflejando las tarjetas visibles frente al total (ej. `3 de 7 tarjetas` si hay filtros activos, o `7 tarjetas` en estado neutro).
+
+### RF-3 — Vista Alternativa (Board vs. List)
+- **RF-3.1.** El conmutador "Board / List" del sub-encabezado permitirá alternar instantáneamente entre la cuadrícula de columnas (`KanbanBoard`) y la tabla/lista vertical (`ListView`).
+- **RF-3.2.** El botón correspondiente a la vista activa se resaltará con estilo visual seleccionado (`bg-[#f1f1ed] text-[#30323a] font-medium`).
+- **RF-3.3.** En la vista "List", las tareas se renderizarán agrupadas por columna/estado, mostrando para cada una: título, extracto de descripción, badge de prioridad, badges de etiquetas y fecha límite si existe.
+- **RF-3.4.** Hacer clic en cualquier fila de la vista "List" disparará la apertura del `CardDetailModal` con los datos íntegros de la tarea, permitiendo su edición y borrado de forma idéntica a la vista "Board".
+- **RF-3.5.** Al conmutar entre "Board" y "List", los filtros aplicados y el término de búsqueda se conservarán intactos.
+
+### RF-4 — Integridad con Drag & Drop
+- **RF-4.1.** En la vista "Board", el drag & drop continuará plenamente operativo entre las tarjetas visibles filtradas, preservando el orden relativo de las tarjetas que hayan quedado temporalmente ocultas por los filtros.
+- **RF-4.2.** En la vista "List", el drag & drop se deshabilitará por diseño para priorizar la navegación rápida, la densidad de información y la accesibilidad tabular.
+
+## Requisitos no funcionales
+- **RNF-1 — Lógica pura desacoplada:** Toda la lógica de filtrado residirá en funciones matemáticas puras en `src/kanban/core/filter.ts` (`filterTasks`, `matchesSearch`, `getAvailableTags`, `countActiveFilters`), con suite de tests unitarios deterministas en `src/kanban/core/__tests__/filter.test.ts`.
+- **RNF-2 — Rendimiento reactivo:** El algoritmo de filtrado sobre colecciones de hasta 200 tarjetas deberá resolverse en menos de 10 ms sin provocar re-renderizados innecesarios en componentes no afectados.
+- **RNF-3 — Tipado estricto:** Cero `any` y contratos tipados en `src/interfaces/kanban.interface.ts` (`KanbanFilters`, `KanbanViewMode`).
+- **RNF-4 — Accesibilidad WAI-ARIA:** El popover de filtros implementará captura de foco, cierre con `Escape`, roles semánticos y etiquetas `aria-label` / `aria-expanded`.
+
+## Casos límite
+- **CL-1 — Búsqueda sin coincidencias en todo el tablero:** Si ningún elemento coincide, las 3 columnas mantendrán su layout fijo y mostrarán el estado vacío correspondiente ("Sin tarjetas coincidentes").
+- **CL-2 — Etiquetas dinámicas tras borrado:** Si se elimina o edita la última tarjeta que contenía una etiqueta específica, dicha etiqueta desaparecerá automáticamente del listado de filtros disponibles en el Popover.
+- **CL-3 — Espacios en blanco:** Criterios de búsqueda formados exclusivamente por espacios en blanco (`"   "`) se sanitizarán con `.trim()` tratándose como búsqueda inactiva (mostrar todas las tarjetas).
+- **CL-4 — Caracteres especiales y tildes:** Búsquedas con caracteres diacríticos (ej. "página", "pagina", "PÁGINA") encontrarán los mismos resultados mediante normalización NFD canónica.
+- **CL-5 — Añadir tarjeta con filtros activos:** Si el usuario pulsa "Add card" en una columna mientras hay filtros activos, la tarjeta se creará en el store de forma inmutable; si sus propiedades por defecto no coinciden con los filtros vigentes, permanecerá en el store y se visibilizará al limpiar los filtros.
+- **CL-6 — Apertura de modal desde fila en ListView:** La fila completa de la lista tabular actuará como disparador interactivo con `cursor-pointer`, aislando botones secundarios de opciones.
+
+## Criterios de finalización
+- [ ] La búsqueda por texto filtra reactivamente por título y descripción con insensibilidad a mayúsculas y acentos.
+- [ ] El panel Popover permite seleccionar múltiples prioridades (OR) y múltiples etiquetas (OR inclusivo), combinadas entre sí con AND.
+- [ ] El botón de filtros muestra el contador de criterios activos y permite limpiarlos con un solo clic.
+- [ ] El sub-header refleja el número de tarjetas visibles (`X de Y tarjetas`).
+- [ ] La vista "List" presenta las tareas agrupadas por estado con sus metadatos y permite abrir `CardDetailModal`.
+- [ ] La conmutación entre "Board" y "List" preserva los filtros activos.
+- [ ] Las columnas sin resultados muestran un placeholder amigable de estado vacío.
+- [ ] La suite de pruebas de `filter.ts` pasa al 100% en `npx vitest run`.
+- [ ] `npx tsc --noEmit` y `npm run lint` pasan con 0 errores y 0 warnings.
+- [ ] `npm run build` genera el bundle de producción limpiamente.
+
+## Dudas abiertas
+*(Ninguna. El alcance técnico está formalizado y consensuado).*
+</file>
+
+<file path="tasks.md">
+# Tareas — Spec 003: Filtros, Búsqueda y Vistas Alternativas
+Estado: pendiente
+
+## Lista de Tareas Atómicas
+
+- [ ] **T1. Contratos de TypeScript para filtros y modo de vista en `src/interfaces/kanban.interface.ts`.** RF-1.2, RF-3.1, RNF-3
+  - Hecho cuando: `npx tsc --noEmit` compila limpiamente exportando `KanbanViewMode` y `KanbanFilters` con tipado estricto sin `any`.
+
+- [ ] **T2. Funciones puras de filtrado, normalización y cálculo de etiquetas en `src/kanban/core/filter.ts`.** RF-1.2, RF-1.3, RF-2.2, RNF-1, CL-3, CL-4
+  - Hecho cuando: `normalizeSearchText`, `matchesSearch`, `matchesPriorities`, `matchesTags`, `filterTasks`, `getAvailableTags`, `countActiveFilters` y `hasActiveFilters` están implementadas como funciones matemáticas puras sin dependencias de React ni Zustand.
+
+- [ ] **T3. Suite de tests unitarios para filtrado en `src/kanban/core/__tests__/filter.test.ts`.** RF-1.2, RF-1.3, RF-2.2, RNF-1, CL-1, CL-2, CL-3, CL-4
+  - Hecho cuando: `npx vitest run src/kanban/core/__tests__/filter.test.ts` pasa al 100% cubriendo `TC-FILT-1` a `TC-FILT-14` (normalización NFD, insensibilidad a tildes/caja, búsquedas vacías, lógica combinatoria AND/OR, inmutabilidad y etiquetas dinámicas).
+
+- [ ] **T4. Primitiva UI accesible `popover.tsx` en `src/components/ui/popover.tsx`.** RF-2.1, RNF-4
+  - Hecho cuando: Se exportan `PopoverRoot`, `PopoverTrigger`, `PopoverContent` y `PopoverClose` basados en `@base-ui/react/popover` con estilos Tailwind, animaciones suaves, portales y soporte de foco WAI-ARIA.
+
+- [ ] **T5. Ampliación del store Zustand con filtros y modo de vista en `src/kanban/store/kanban.store.ts`.** RF-1.1, RF-2.2, RF-2.3, RF-3.1, RF-3.5
+  - Hecho cuando: El store gestiona `viewMode`, `filters` y las acciones `setViewMode`, `setSearchQuery`, `togglePriorityFilter`, `toggleTagFilter` y `clearFilters` de forma inmutable, aislados de `localStorage` mediante `partialize`.
+
+- [ ] **T6. Componente de búsqueda reactiva `SearchInput.tsx` en `src/kanban/components/Controls/SearchInput.tsx`.** RF-1.1, RF-1.3, CL-3, CL-4
+  - Hecho cuando: El componente renderiza un campo accesible con botón para limpiar texto (`X`), tecla `Escape` para cerrar/limpiar y conexión reactiva con `setSearchQuery`.
+
+- [ ] **T7. Panel flotante de filtros `BoardFilterPopover.tsx` en `src/kanban/components/Controls/BoardFilterPopover.tsx`.** RF-2.1, RF-2.2, RF-2.3, CL-2
+  - Hecho cuando: El popover incluye botón disparador con badge numérico de criterios activos, selectores de prioridad (`CardPriorityBadge`), etiquetas dinámicas (`getAvailableTags`) y botón "Limpiar filtros".
+
+- [ ] **T8. Integración de controles en `BoardHeader.tsx` y estado vacío amigable en `KanbanColumn.tsx`.** RF-1.1, RF-1.4, RF-2.1, RF-4.1, CL-1
+  - Hecho cuando: `BoardHeader` monta `SearchInput` y `BoardFilterPopover`, y `KanbanColumn` renderiza solo las tarjetas filtradas, manteniendo el dropzone operativo y mostrando el placeholder informativo si no hay coincidencias.
+
+- [ ] **T9. Vista alternativa de lista `ListView.tsx` en `src/kanban/components/List/ListView.tsx`.** RF-3.2, RF-3.3, RF-3.4, RF-4.2, CL-6
+  - Hecho cuando: `ListView` renderiza las tarjetas filtradas organizadas por columnas/estado con sus metadatos y hacer clic en cualquier fila ejecuta `setSelectedTaskId` abriendo `CardDetailModal`.
+
+- [ ] **T10. Integración en `BoardPage.tsx` y verificación end-to-end completa.** RF-1.1 a RF-4.2, CL-1 a CL-6
+  - Hecho cuando: El conmutador "Board / List" alterna reactivamente la visualización, el contador contextual refleja `X de Y tarjetas`, y `npx vitest run`, `npx tsc --noEmit`, `npm run lint` y `npm run build` pasan limpios con 0 errores.
+</file>
+
+</files>

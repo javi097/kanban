@@ -45,3 +45,12 @@ export interface TaskPayloadValidationResult {
   sanitizedPayload: UpdateTaskPayload;
 }
 
+export type KanbanViewMode = 'board' | 'list';
+
+export interface KanbanFilters {
+  searchQuery: string;
+  priorities: Priority[];
+  tags: string[];
+}
+
+

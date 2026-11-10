@@ -15,7 +15,7 @@ Estado: pendiente
 - [x] **T4. Primitiva UI accesible `popover.tsx` en `src/components/ui/popover.tsx`.** RF-2.1, RNF-4
   - Hecho cuando: Se exportan `PopoverRoot`, `PopoverTrigger`, `PopoverContent` y `PopoverClose` basados en `@base-ui/react/popover` con estilos Tailwind, animaciones suaves, portales y soporte de foco WAI-ARIA.
 
-- [ ] **T5. Ampliación del store Zustand con filtros y modo de vista en `src/kanban/store/kanban.store.ts`.** RF-1.1, RF-2.2, RF-2.3, RF-3.1, RF-3.5
+- [x] **T5. Ampliación del store Zustand con filtros y modo de vista en `src/kanban/store/kanban.store.ts`.** RF-1.1, RF-2.2, RF-2.3, RF-3.1, RF-3.5
   - Hecho cuando: El store gestiona `viewMode`, `filters` y las acciones `setViewMode`, `setSearchQuery`, `togglePriorityFilter`, `toggleTagFilter` y `clearFilters` de forma inmutable, aislados de `localStorage` mediante `partialize`.
 
 - [ ] **T6. Componente de búsqueda reactiva `SearchInput.tsx` en `src/kanban/components/Controls/SearchInput.tsx`.** RF-1.1, RF-1.3, CL-3, CL-4

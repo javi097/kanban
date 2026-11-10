@@ -1,7 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Task, Status, UpdateTaskPayload } from '@/interfaces/kanban.interface';
+import type {
+  Task,
+  Status,
+  UpdateTaskPayload,
+  Priority,
+  KanbanViewMode,
+  KanbanFilters,
+} from '@/interfaces/kanban.interface';
 import { validateTaskPayload } from '@/kanban/core/validator';
+
+const INITIAL_FILTERS: KanbanFilters = {
+  searchQuery: '',
+  priorities: [],
+  tags: [],
+};
 
 const INITIAL_TASKS: Task[] = [
   {
@@ -70,13 +83,23 @@ interface KanbanState {
   tasks: Task[];
   addingTo: Status | null;
   selectedTaskId: number | null;
+  viewMode: KanbanViewMode;
+  filters: KanbanFilters;
 
+  // Acciones existentes
   setAddingTo: (status: Status | null) => void;
   setSelectedTaskId: (id: number | null) => void;
   addTask: (title: string, status: Status) => void;
   updateTask: (id: number, payload: UpdateTaskPayload) => void;
   deleteTask: (id: number) => void;
   reorderTasks: (newTasks: Task[]) => void;
+
+  // Nuevas acciones de filtros y vistas (Spec 003)
+  setViewMode: (mode: KanbanViewMode) => void;
+  setSearchQuery: (query: string) => void;
+  togglePriorityFilter: (priority: Priority) => void;
+  toggleTagFilter: (tag: string) => void;
+  clearFilters: () => void;
 }
 
 export const useKanbanStore = create<KanbanState>()(
@@ -85,6 +108,8 @@ export const useKanbanStore = create<KanbanState>()(
       tasks: INITIAL_TASKS,
       addingTo: null,
       selectedTaskId: null,
+      viewMode: 'board',
+      filters: INITIAL_FILTERS,
 
       setAddingTo: (status) =>
         set({ addingTo: status }),
@@ -135,6 +160,45 @@ export const useKanbanStore = create<KanbanState>()(
         );
         set({ tasks: validTasks });
       },
+
+      setViewMode: (mode) =>
+        set({ viewMode: mode }),
+
+      setSearchQuery: (query) =>
+        set((state) => ({
+          filters: { ...state.filters, searchQuery: query },
+        })),
+
+      togglePriorityFilter: (priority) =>
+        set((state) => {
+          const exists = state.filters.priorities.includes(priority);
+          const newPriorities = exists
+            ? state.filters.priorities.filter((p) => p !== priority)
+            : [...state.filters.priorities, priority];
+          return {
+            filters: { ...state.filters, priorities: newPriorities },
+          };
+        }),
+
+      toggleTagFilter: (tag) =>
+        set((state) => {
+          const normalizedTag = tag.trim();
+          if (!normalizedTag) return state;
+          const exists = state.filters.tags.some(
+            (t) => t.toLowerCase() === normalizedTag.toLowerCase(),
+          );
+          const newTags = exists
+            ? state.filters.tags.filter(
+                (t) => t.toLowerCase() !== normalizedTag.toLowerCase(),
+              )
+            : [...state.filters.tags, normalizedTag];
+          return {
+            filters: { ...state.filters, tags: newTags },
+          };
+        }),
+
+      clearFilters: () =>
+        set({ filters: INITIAL_FILTERS }),
     }),
     {
       name: 'kanban-storage',
@@ -142,7 +206,13 @@ export const useKanbanStore = create<KanbanState>()(
       migrate: (persistedState: unknown) => {
         const state = persistedState as { tasks?: Task[] } | undefined;
         if (!state || !Array.isArray(state.tasks)) {
-          return { tasks: INITIAL_TASKS, addingTo: null, selectedTaskId: null };
+          return {
+            tasks: INITIAL_TASKS,
+            addingTo: null,
+            selectedTaskId: null,
+            viewMode: 'board',
+            filters: INITIAL_FILTERS,
+          };
         }
         const validTasks = state.tasks.filter(
           (t): t is Task => Boolean(t && typeof t.id === 'number' && t.status),
@@ -152,6 +222,8 @@ export const useKanbanStore = create<KanbanState>()(
           tasks: validTasks.length > 0 ? validTasks : INITIAL_TASKS,
           addingTo: null,
           selectedTaskId: null,
+          viewMode: 'board',
+          filters: INITIAL_FILTERS,
         };
       },
     },

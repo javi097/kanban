@@ -15,10 +15,10 @@ Estado: pendiente
 - [x] **T4. Ampliación inmutable del store Zustand con `updateTask`, `deleteTask` y `selectedTaskId` en `src/kanban/store/kanban.store.ts`.** RF-2.4, RF-2.5, RF-4.3, RF-5.1, RNF-2, CL-3
   - Hecho cuando: El store gestiona `selectedTaskId`, actualiza tareas inmutablemente con `.map()`, borra con `.filter()`, resetea la selección si la tarea activa se elimina, y aísla la persistencia con `partialize` bajo `kanban-storage`.
 
-- [ ] **T5. Primitivas UI accesibles `dialog.tsx` y `alert-dialog.tsx` en `src/components/ui/`.** RF-1.3, RF-4.2, RNF-1
+- [x] **T5. Primitivas UI accesibles `dialog.tsx` y `alert-dialog.tsx` en `src/components/ui/`.** RF-1.3, RF-4.2, RNF-1
   - Hecho cuando: Se exportan los componentes basados en `@base-ui/react/dialog` y `@base-ui/react/alert-dialog` con estilos de Tailwind, soporte de animaciones y atributos WAI-ARIA acordes a `button.tsx`.
 
-- [ ] **T6. Diálogo de confirmación defensivo `ConfirmDialog.tsx` en `src/components/custom/ConfirmDialog.tsx`.** RF-4.2, RNF-1
+- [x] **T6. Diálogo de confirmación defensivo `ConfirmDialog.tsx` en `src/components/custom/ConfirmDialog.tsx`.** RF-4.2, RNF-1
   - Hecho cuando: El componente accesible renderiza un `alertdialog` con variantes destructiva/por defecto, botón de confirmación tipado y foco inicial seguro en cancelar.
 
 - [ ] **T7. Componentes atómicos `CardPriorityBadge.tsx` y `CardTag.tsx` en `src/kanban/components/Card/`.** RF-1.2, RF-2.3, RF-3.2

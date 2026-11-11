@@ -1,5 +1,5 @@
 # Tareas — Spec 003: Filtros, Búsqueda y Vistas Alternativas
-Estado: pendiente
+Estado: completado
 
 ## Lista de Tareas Atómicas
 
@@ -30,5 +30,5 @@ Estado: pendiente
 - [x] **T9. Vista alternativa de lista `ListView.tsx` en `src/kanban/components/List/ListView.tsx`.** RF-3.2, RF-3.3, RF-3.4, RF-4.2, CL-6
   - Hecho cuando: `ListView` renderiza las tarjetas filtradas organizadas por columnas/estado con sus metadatos y hacer clic en cualquier fila ejecuta `setSelectedTaskId` abriendo `CardDetailModal`.
 
-- [ ] **T10. Integración en `BoardPage.tsx` y verificación end-to-end completa.** RF-1.1 a RF-4.2, CL-1 a CL-6
+- [x] **T10. Integración en `BoardPage.tsx` y verificación end-to-end completa.** RF-1.1 a RF-4.2, CL-1 a CL-6
   - Hecho cuando: El conmutador "Board / List" alterna reactivamente la visualización, el contador contextual refleja `X de Y tarjetas`, y `npx vitest run`, `npx tsc --noEmit`, `npm run lint` y `npm run build` pasan limpios con 0 errores.

@@ -1,5 +1,5 @@
 # Spec 003 — Filtros, Búsqueda y Vistas Alternativas
-Estado: aprobado
+Estado: implementada
 
 ## Contexto y objetivo
 El tablero Kanban permite arrastrar tarjetas y gestionar su contenido mediante CRUD completo (Spec 001 y Spec 002), pero carece de herramientas de localización cuando el volumen de tareas crece. El objetivo de esta spec es dotar al espacio de trabajo de búsqueda reactiva por texto, filtrado acumulativo por prioridad y etiquetas, e incorporar una vista alternativa en lista ("List view") junto a la vista actual en columnas ("Board view"), manteniendo la accesibilidad WAI-ARIA, la pureza matemática en el filtrado y la integridad del drag & drop.
@@ -66,16 +66,16 @@ El tablero Kanban permite arrastrar tarjetas y gestionar su contenido mediante C
 - **CL-6 — Apertura de modal desde fila en ListView:** La fila completa de la lista tabular actuará como disparador interactivo con `cursor-pointer`, aislando botones secundarios de opciones.
 
 ## Criterios de finalización
-- [ ] La búsqueda por texto filtra reactivamente por título y descripción con insensibilidad a mayúsculas y acentos.
-- [ ] El panel Popover permite seleccionar múltiples prioridades (OR) y múltiples etiquetas (OR inclusivo), combinadas entre sí con AND.
-- [ ] El botón de filtros muestra el contador de criterios activos y permite limpiarlos con un solo clic.
-- [ ] El sub-header refleja el número de tarjetas visibles (`X de Y tarjetas`).
-- [ ] La vista "List" presenta las tareas agrupadas por estado con sus metadatos y permite abrir `CardDetailModal`.
-- [ ] La conmutación entre "Board" y "List" preserva los filtros activos.
-- [ ] Las columnas sin resultados muestran un placeholder amigable de estado vacío.
-- [ ] La suite de pruebas de `filter.ts` pasa al 100% en `npx vitest run`.
-- [ ] `npx tsc --noEmit` y `npm run lint` pasan con 0 errores y 0 warnings.
-- [ ] `npm run build` genera el bundle de producción limpiamente.
+- [x] La búsqueda por texto filtra reactivamente por título y descripción con insensibilidad a mayúsculas y acentos.
+- [x] El panel Popover permite seleccionar múltiples prioridades (OR) y múltiples etiquetas (OR inclusivo), combinadas entre sí con AND.
+- [x] El botón de filtros muestra el contador de criterios activos y permite limpiarlos con un solo clic.
+- [x] El sub-header refleja el número de tarjetas visibles (`X de Y tarjetas`).
+- [x] La vista "List" presenta las tareas agrupadas por estado con sus metadatos y permite abrir `CardDetailModal`.
+- [x] La conmutación entre "Board" y "List" preserva los filtros activos.
+- [x] Las columnas sin resultados muestran un placeholder amigable de estado vacío.
+- [x] La suite de pruebas de `filter.ts` pasa al 100% en `npx vitest run`.
+- [x] `npx tsc --noEmit` y `npm run lint` pasan con 0 errores y 0 warnings.
+- [x] `npm run build` genera el bundle de producción limpiamente.
 
 ## Dudas abiertas
 *(Ninguna. El alcance técnico está formalizado y consensuado).*

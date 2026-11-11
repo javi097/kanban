@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { KanbanCard } from '@/kanban/components/Card/KanbanCard';
 import { useKanbanStore } from '@/kanban/store/kanban.store';
+import { filterTasks } from '@/kanban/core/filter';
 import type { Status } from '@/interfaces/kanban.interface';
 
 interface Props {
@@ -19,15 +20,20 @@ export function KanbanColumn({ name, icon: Icon, color }: Props) {
   const { setNodeRef, isOver } = useDroppable({ id: name });
 
   const tasks = useKanbanStore((s) => s.tasks);
+  const filters = useKanbanStore((s) => s.filters);
+  const clearFilters = useKanbanStore((s) => s.clearFilters);
   const addingTo = useKanbanStore((s) => s.addingTo);
   const setAddingTo = useKanbanStore((s) => s.setAddingTo);
   const addTask = useKanbanStore((s) => s.addTask);
 
   const [newTitle, setNewTitle] = useState('');
 
-  const columnTasks = Array.isArray(tasks)
+  const allColumnTasks = Array.isArray(tasks)
     ? tasks.filter((task) => Boolean(task && task.status === name && typeof task.id === 'number'))
     : [];
+
+  const filteredColumnTasks = filterTasks(allColumnTasks, filters);
+  const hasFilterMismatch = allColumnTasks.length > 0 && filteredColumnTasks.length === 0;
 
   const isAdding = addingTo === name;
 
@@ -56,7 +62,7 @@ export function KanbanColumn({ name, icon: Icon, color }: Props) {
           <Icon className={`size-4 ${color}`} />
           <h2 className="text-sm font-semibold text-[#35363b]">{name}</h2>
           <span className="flex size-5 items-center justify-center rounded-full bg-[#e2e2de] text-[11px] font-semibold text-[#85868a]">
-            {columnTasks.length}
+            {filteredColumnTasks.length}
           </span>
         </div>
         <Button
@@ -71,14 +77,29 @@ export function KanbanColumn({ name, icon: Icon, color }: Props) {
 
       {/* Task list */}
       <div className="flex flex-1 flex-col gap-3">
-        <SortableContext
-          items={columnTasks.map((t) => `task-${t.id}`)}
-          strategy={verticalListSortingStrategy}
-        >
-          {columnTasks.map((task) => (
-            <KanbanCard key={task.id} task={task} />
-          ))}
-        </SortableContext>
+        {filteredColumnTasks.length > 0 ? (
+          <SortableContext
+            items={filteredColumnTasks.map((t) => `task-${t.id}`)}
+            strategy={verticalListSortingStrategy}
+          >
+            {filteredColumnTasks.map((task) => (
+              <KanbanCard key={task.id} task={task} />
+            ))}
+          </SortableContext>
+        ) : hasFilterMismatch ? (
+          <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-dashed border-[#d9d9d4] p-6 text-center">
+            <p className="text-xs font-medium text-[#85868a]">
+              Sin tarjetas coincidentes
+            </p>
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="mt-2 text-xs font-medium text-[#252a45] hover:underline cursor-pointer focus-visible:outline-none"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        ) : null}
 
         {/* Inline add form or add button */}
         {isAdding ? (

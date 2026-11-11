@@ -24,7 +24,7 @@ Estado: pendiente
 - [x] **T7. Panel flotante de filtros `BoardFilterPopover.tsx` en `src/kanban/components/Controls/BoardFilterPopover.tsx`.** RF-2.1, RF-2.2, RF-2.3, CL-2
   - Hecho cuando: El popover incluye botón disparador con badge numérico de criterios activos, selectores de prioridad (`CardPriorityBadge`), etiquetas dinámicas (`getAvailableTags`) y botón "Limpiar filtros".
 
-- [ ] **T8. Integración de controles en `BoardHeader.tsx` y estado vacío amigable en `KanbanColumn.tsx`.** RF-1.1, RF-1.4, RF-2.1, RF-4.1, CL-1
+- [x] **T8. Integración de controles en `BoardHeader.tsx` y estado vacío amigable en `KanbanColumn.tsx`.** RF-1.1, RF-1.4, RF-2.1, RF-4.1, CL-1
   - Hecho cuando: `BoardHeader` monta `SearchInput` y `BoardFilterPopover`, y `KanbanColumn` renderiza solo las tarjetas filtradas, manteniendo el dropzone operativo y mostrando el placeholder informativo si no hay coincidencias.
 
 - [ ] **T9. Vista alternativa de lista `ListView.tsx` en `src/kanban/components/List/ListView.tsx`.** RF-3.2, RF-3.3, RF-3.4, RF-4.2, CL-6

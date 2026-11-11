@@ -1,6 +1,8 @@
-import { LayoutGrid, Search, SlidersHorizontal, Plus } from 'lucide-react';
+import { LayoutGrid, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useKanbanStore } from '@/kanban/store/kanban.store';
+import { SearchInput } from '@/kanban/components/Controls/SearchInput';
+import { BoardFilterPopover } from '@/kanban/components/Controls/BoardFilterPopover';
 
 export function BoardHeader() {
   const setAddingTo = useKanbanStore((s) => s.setAddingTo);
@@ -25,22 +27,8 @@ export function BoardHeader() {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon"
-          className="border-[#e3e3df] bg-white text-[#74757b] hover:bg-[#f1f1ed]"
-          aria-label="Search"
-        >
-          <Search />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="border-[#e3e3df] bg-white text-[#74757b] hover:bg-[#f1f1ed]"
-          aria-label="Filter board"
-        >
-          <SlidersHorizontal />
-        </Button>
+        <SearchInput />
+        <BoardFilterPopover />
         <Button
           className="bg-[#252a45] px-3.5 text-white hover:bg-[#333957]"
           onClick={() => setAddingTo('To Do')}
@@ -52,3 +40,4 @@ export function BoardHeader() {
     </header>
   );
 }
+

@@ -27,7 +27,7 @@ Estado: pendiente
 - [x] **T8. Integración de controles en `BoardHeader.tsx` y estado vacío amigable en `KanbanColumn.tsx`.** RF-1.1, RF-1.4, RF-2.1, RF-4.1, CL-1
   - Hecho cuando: `BoardHeader` monta `SearchInput` y `BoardFilterPopover`, y `KanbanColumn` renderiza solo las tarjetas filtradas, manteniendo el dropzone operativo y mostrando el placeholder informativo si no hay coincidencias.
 
-- [ ] **T9. Vista alternativa de lista `ListView.tsx` en `src/kanban/components/List/ListView.tsx`.** RF-3.2, RF-3.3, RF-3.4, RF-4.2, CL-6
+- [x] **T9. Vista alternativa de lista `ListView.tsx` en `src/kanban/components/List/ListView.tsx`.** RF-3.2, RF-3.3, RF-3.4, RF-4.2, CL-6
   - Hecho cuando: `ListView` renderiza las tarjetas filtradas organizadas por columnas/estado con sus metadatos y hacer clic en cualquier fila ejecuta `setSelectedTaskId` abriendo `CardDetailModal`.
 
 - [ ] **T10. Integración en `BoardPage.tsx` y verificación end-to-end completa.** RF-1.1 a RF-4.2, CL-1 a CL-6
